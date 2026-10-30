@@ -81,7 +81,7 @@ public class FilterListIterator<E> implements ListIterator<E> {
      *
      * @param iterator  the iterator to use
      */
-    public FilterListIterator(final ListIterator<? extends E> iterator ) {
+    public FilterListIterator(final ListIterator<? extends E> iterator) {
         this.iterator = iterator;
     }
 
@@ -193,11 +193,11 @@ public class FilterListIterator<E> implements ListIterator<E> {
 
     /**
      * Not supported.
-     * @param o the element with which to replace the last element returned by
+     * @param ignored the element with which to replace the last element returned by
      *          {@code next} or {@code previous}
      */
     @Override
-    public void set(final E o) {
+    public void set(final E ignored) {
         throw new UnsupportedOperationException("FilterListIterator.set(Object) is not supported.");
     }
 
@@ -229,7 +229,7 @@ public class FilterListIterator<E> implements ListIterator<E> {
         }
         while (iterator.hasNext()) {
             final E object = iterator.next();
-            if (predicate.evaluate(object)) {
+            if (predicate.test(object)) {
                 nextObject = object;
                 nextObjectSet = true;
                 return true;
@@ -265,7 +265,7 @@ public class FilterListIterator<E> implements ListIterator<E> {
         }
         while (iterator.hasPrevious()) {
             final E object = iterator.previous();
-            if (predicate.evaluate(object)) {
+            if (predicate.test(object)) {
                 previousObject = object;
                 previousObjectSet = true;
                 return true;

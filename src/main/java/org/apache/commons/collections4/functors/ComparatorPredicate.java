@@ -45,7 +45,7 @@ import org.apache.commons.collections4.Predicate;
  * following way:</p>
  *
  * <pre>
- * ComparatorPredicate.comparatorPredicate(ONE, comparator).evaluate(TWO);
+ * ComparatorPredicate.comparatorPredicate(ONE, comparator).test(TWO);
  * </pre>
  *
  * <p>The input variable {@code TWO} in compared to the stored variable {@code ONE} using
@@ -67,27 +67,53 @@ import org.apache.commons.collections4.Predicate;
  * evaluation of a comparator result.</p>
  *
  * <pre>
- * ComparatorPredicate.comparatorPredicate(ONE, comparator,<b>ComparatorPredicate.Criterion.GREATER</b>).evaluate(TWO);
+ * ComparatorPredicate.comparatorPredicate(ONE, comparator,<b>ComparatorPredicate.Criterion.GREATER</b>).test(TWO);
  * </pre>
  *
  * <p>The input variable TWO is compared to the stored variable ONE using the supplied {@code comparator}
  * using the {@code GREATER} evaluation criterion constant. This instructs the predicate to
  * return {@code true} if the comparator returns a value greater than {@code 0}.</p>
  *
+ * @param <T> the type of the input to the predicate.
  * @since 4.0
  */
-public class ComparatorPredicate<T> implements Predicate<T>, Serializable {
+public class ComparatorPredicate<T> extends AbstractPredicate<T> implements Serializable {
 
+    /**
+     * Enumerates the comparator criteria.
+     */
     public enum Criterion {
-        EQUAL, GREATER, LESS, GREATER_OR_EQUAL, LESS_OR_EQUAL,
+
+        /**
+         * Equal criterion.
+         */
+        EQUAL,
+
+        /**
+         * Greater criterion.
+         */
+        GREATER,
+
+        /**
+         * Less criterion.
+         */
+        LESS,
+
+        /**
+         * Greater or equal criterion.
+         */
+        GREATER_OR_EQUAL,
+
+        /**
+         * Less or equal Criterion.
+         */
+        LESS_OR_EQUAL,
     }
 
     private static final long serialVersionUID = -1863209236504077399L;
 
-    // Instance variables:
-
     /**
-     * Factory to create the comparator predicate
+     * Creates the comparator predicate
      *
      * @param <T> the type that the predicate queries
      * @param object  the object to compare to
@@ -100,7 +126,7 @@ public class ComparatorPredicate<T> implements Predicate<T>, Serializable {
     }
 
     /**
-     * Factory to create the comparator predicate
+     * Creates the comparator predicate
      *
      * @param <T> the type that the predicate queries
      * @param object  the object to compare to
@@ -149,7 +175,7 @@ public class ComparatorPredicate<T> implements Predicate<T>, Serializable {
      * <li>{@code comparator.compare(object, input) &lt;= 0 &amp;&amp; criterion == LESS_OR_EQUAL}</li>
      * </ul>
      *
-     * @see org.apache.commons.collections4.Predicate#evaluate(Object)
+     * @see org.apache.commons.collections4.Predicate#test(Object)
      * @see java.util.Comparator#compare(Object first, Object second)
      *
      * @param target  the target object to compare to
@@ -157,7 +183,7 @@ public class ComparatorPredicate<T> implements Predicate<T>, Serializable {
      * @throws IllegalStateException if the criterion is invalid (really not possible)
      */
     @Override
-    public boolean evaluate(final T target) {
+    public boolean test(final T target) {
 
         boolean result = false;
         final int comparison = comparator.compare(object, target);

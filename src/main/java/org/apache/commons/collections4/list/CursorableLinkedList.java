@@ -55,6 +55,7 @@ import java.util.ListIterator;
  * <b>Note that this implementation is not synchronized.</b>
  * </p>
  *
+ * @param <E> the type of the elements in the list.
  * @see java.util.LinkedList
  * @since 1.0
  * @deprecated parent {@link AbstractLinkedList} is source incompatible with List methods added in Java 21
@@ -121,7 +122,7 @@ public class CursorableLinkedList<E> extends AbstractLinkedList<E> implements Se
          * Mark this cursor as no longer being needed. Any resources
          * associated with this cursor are immediately released.
          * In previous versions of this class, it was mandatory to close
-         * all cursor objects to avoid memory leaks. It is <i>no longer</i>
+         * all cursor objects to avoid memory leaks. It is <em>no longer</em>
          * necessary to call this close method; an instance of this class
          * can now be treated exactly like a normal iterator.
          */
@@ -605,10 +606,10 @@ public class CursorableLinkedList<E> extends AbstractLinkedList<E> implements Se
     }
 
     /**
-     * Serializes the data held in this object to the stream specified.
+     * Serializes this object to an ObjectOutputStream.
      *
-     * @param out  the output stream
-     * @throws IOException if an error occurs while writing to the stream
+     * @param out the target ObjectOutputStream.
+     * @throws IOException thrown when an I/O errors occur writing to the target stream.
      */
     private void writeObject(final ObjectOutputStream out) throws IOException {
         out.defaultWriteObject();

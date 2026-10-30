@@ -47,7 +47,10 @@ public class IdentityMap<K, V>
         extends AbstractHashedMap<K, V> implements Serializable, Cloneable {
 
     /**
-     * HashEntry
+     * HashEntry.
+     *
+     * @param <K> the key type.
+     * @param <V> the value type.
      */
     protected static class IdentityEntry<K, V> extends HashEntry<K, V> {
 
@@ -184,7 +187,11 @@ public class IdentityMap<K, V>
     }
 
     /**
-     * Read the map in using a custom routine.
+     * Deserializes an instance from an ObjectInputStream.
+     *
+     * @param in The source ObjectInputStream.
+     * @throws IOException            Any of the usual Input/Output related exceptions.
+     * @throws ClassNotFoundException A class of a serialized object cannot be found.
      */
     private void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException {
         in.defaultReadObject();
@@ -192,7 +199,10 @@ public class IdentityMap<K, V>
     }
 
     /**
-     * Write the map out using a custom routine.
+     * Serializes this object to an ObjectOutputStream.
+     *
+     * @param out the target ObjectOutputStream.
+     * @throws IOException thrown when an I/O errors occur writing to the target stream.
      */
     private void writeObject(final ObjectOutputStream out) throws IOException {
         out.defaultWriteObject();

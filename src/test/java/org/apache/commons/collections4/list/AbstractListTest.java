@@ -43,15 +43,19 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
 
 /**
- * Abstract test class for {@link java.util.List} methods and contracts.
+ * Tests {@link java.util.List}.
  * <p>
  * To use, simply extend this class, and implement
  * the {@link #makeObject} method.
+ * </p>
  * <p>
  * If your {@link List} fails one of these tests by design,
  * you may still use this base set of cases.  Simply override the
  * test case (method) your {@link List} fails or override one of the
  * protected methods from AbstractCollectionTest.
+ * </p>
+ *
+ * @param <E> the type of elements returned by this iterator
  */
 public abstract class AbstractListTest<E> extends AbstractCollectionTest<E> {
 
@@ -110,16 +114,16 @@ public abstract class AbstractListTest<E> extends AbstractCollectionTest<E> {
         @Override
         public void resetEmpty() {
             outer.resetFull();
-            this.setCollection(outer.getCollection().subList(4, 4));
-            this.setConfirmed(outer.getConfirmed().subList(4, 4));
+            setCollection(outer.getCollection().subList(4, 4));
+            setConfirmed(outer.getConfirmed().subList(4, 4));
         }
 
         @Override
         public void resetFull() {
             outer.resetFull();
             final int size = outer.getConfirmed().size();
-            this.setCollection(outer.getCollection().subList(3, size - 3));
-            this.setConfirmed(outer.getConfirmed().subList(3, size - 3));
+            setCollection(outer.getCollection().subList(3, size - 3));
+            setConfirmed(outer.getConfirmed().subList(3, size - 3));
         }
 
         @Override
@@ -136,7 +140,7 @@ public abstract class AbstractListTest<E> extends AbstractCollectionTest<E> {
 
         @Override
         public E addSetValue() {
-            return AbstractListTest.this.getOtherElements()[0];
+            return getOtherElements()[0];
         }
 
         @Override
@@ -153,12 +157,12 @@ public abstract class AbstractListTest<E> extends AbstractCollectionTest<E> {
 
         @Override
         public boolean supportsAdd() {
-            return AbstractListTest.this.isAddSupported();
+            return isAddSupported();
         }
 
         @Override
         public boolean supportsRemove() {
-            return AbstractListTest.this.isRemoveSupported();
+            return isRemoveSupported();
         }
 
         @Override
@@ -215,7 +219,7 @@ public abstract class AbstractListTest<E> extends AbstractCollectionTest<E> {
     /**
      *  Returns a {@link BulkTest} for testing {@link List#subList(int,int)}.
      *  The returned bulk test will run through every {@code TestList}
-     *  method, <i>including</i> another {@code bulkTestSubList}.
+     *  method, <em>including</em> another {@code bulkTestSubList}.
      *  Sublists are tested until the size of the sublist is less than 10.
      *  Each sublist is 6 elements smaller than its parent list.
      *  (By default this means that two rounds of sublists will be tested).

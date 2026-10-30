@@ -24,15 +24,16 @@ import org.apache.commons.collections4.Predicate;
 /**
  * Predicate implementation that returns the opposite of the decorated predicate.
  *
+ * @param <T> the type of the input to the predicate.
  * @since 3.0
  */
-public final class NotPredicate<T> implements PredicateDecorator<T>, Serializable {
+public final class NotPredicate<T> extends AbstractPredicate<T> implements PredicateDecorator<T>, Serializable {
 
     /** Serial version UID */
     private static final long serialVersionUID = -2654603322338049674L;
 
     /**
-     * Factory to create the not predicate.
+     * Creates the not predicate.
      *
      * @param <T> the type that the predicate queries
      * @param predicate  the predicate to decorate, not null
@@ -57,17 +58,6 @@ public final class NotPredicate<T> implements PredicateDecorator<T>, Serializabl
     }
 
     /**
-     * Evaluates the predicate returning the opposite to the stored predicate.
-     *
-     * @param object  the input object
-     * @return true if predicate returns false
-     */
-    @Override
-    public boolean evaluate(final T object) {
-        return !iPredicate.evaluate(object);
-    }
-
-    /**
      * Gets the predicate being decorated.
      *
      * @return the predicate as the only element in an array
@@ -77,6 +67,17 @@ public final class NotPredicate<T> implements PredicateDecorator<T>, Serializabl
     @SuppressWarnings("unchecked")
     public Predicate<? super T>[] getPredicates() {
         return new Predicate[] {iPredicate};
+    }
+
+    /**
+     * Evaluates the predicate returning the opposite to the stored predicate.
+     *
+     * @param object  the input object
+     * @return true if predicate returns false
+     */
+    @Override
+    public boolean test(final T object) {
+        return !iPredicate.test(object);
     }
 
 }

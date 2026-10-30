@@ -126,7 +126,7 @@ public final class UnmodifiableSortedMap<K, V>
     }
 
     /**
-     * Read the map in using a custom routine.
+     * Deserializes the map in using a custom routine.
      *
      * @param in  the input stream
      * @throws IOException if an error occurs while reading from the stream
@@ -160,10 +160,10 @@ public final class UnmodifiableSortedMap<K, V>
     }
 
     /**
-     * Write the map out using a custom routine.
+     * Serializes this object to an ObjectOutputStream.
      *
-     * @param out  the output stream
-     * @throws IOException if an error occurs while writing to the stream
+     * @param out the target ObjectOutputStream.
+     * @throws IOException thrown when an I/O errors occur writing to the target stream.
      * @since 3.1
      */
     private void writeObject(final ObjectOutputStream out) throws IOException {

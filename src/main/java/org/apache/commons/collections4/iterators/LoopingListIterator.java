@@ -57,11 +57,7 @@ public class LoopingListIterator<E> implements ResettableListIterator<E> {
      */
     public LoopingListIterator(final List<E> list) {
         this.list = Objects.requireNonNull(list, "collection");
-        _reset();
-    }
-
-    private void _reset() {
-        iterator = list.listIterator();
+        init();
     }
 
     /**
@@ -108,6 +104,10 @@ public class LoopingListIterator<E> implements ResettableListIterator<E> {
     @Override
     public boolean hasPrevious() {
         return !list.isEmpty();
+    }
+
+    private void init() {
+        iterator = list.listIterator();
     }
 
     /**
@@ -206,7 +206,7 @@ public class LoopingListIterator<E> implements ResettableListIterator<E> {
      * Removes the previously retrieved item from the underlying list.
      * <p>
      * This feature is only supported if the underlying list's
-     * {@link List#iterator iterator} method returns an implementation
+     * {@link List#iterator()} method returns an implementation
      * that supports it.
      * <p>
      * This method can only be called after at least one {@link #next}
@@ -230,7 +230,7 @@ public class LoopingListIterator<E> implements ResettableListIterator<E> {
      */
     @Override
     public void reset() {
-        _reset();
+        init();
     }
 
     /**

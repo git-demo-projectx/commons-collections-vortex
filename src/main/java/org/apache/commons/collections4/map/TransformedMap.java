@@ -139,7 +139,7 @@ public class TransformedMap<K, V>
      */
     @Override
     protected V checkSetValue(final V value) {
-        return valueTransformer.transform(value);
+        return valueTransformer.apply(value);
     }
 
     /**
@@ -167,7 +167,7 @@ public class TransformedMap<K, V>
     }
 
     /**
-     * Read the map in using a custom routine.
+     * Deserializes the map in using a custom routine.
      *
      * @param in  the input stream
      * @throws IOException if an error occurs while reading from the stream
@@ -192,7 +192,7 @@ public class TransformedMap<K, V>
         if (keyTransformer == null) {
             return object;
         }
-        return keyTransformer.transform(object);
+        return keyTransformer.apply(object);
     }
 
     /**
@@ -228,14 +228,14 @@ public class TransformedMap<K, V>
         if (valueTransformer == null) {
             return object;
         }
-        return valueTransformer.transform(object);
+        return valueTransformer.apply(object);
     }
 
     /**
-     * Write the map out using a custom routine.
+     * Serializes this object to an ObjectOutputStream.
      *
-     * @param out  the output stream
-     * @throws IOException if an error occurs while writing to the stream
+     * @param out the target ObjectOutputStream.
+     * @throws IOException thrown when an I/O errors occur writing to the target stream.
      * @since 3.1
      */
     private void writeObject(final ObjectOutputStream out) throws IOException {

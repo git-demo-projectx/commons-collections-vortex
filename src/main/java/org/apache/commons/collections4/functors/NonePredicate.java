@@ -29,6 +29,7 @@ import org.apache.commons.collections4.Predicate;
  * threw an exception.
  * </p>
  *
+ * @param <T> the type of the input to the predicate.
  * @since 3.0
  */
 public final class NonePredicate<T> extends AbstractQuantifierPredicate<T> {
@@ -37,9 +38,10 @@ public final class NonePredicate<T> extends AbstractQuantifierPredicate<T> {
     private static final long serialVersionUID = 2007613066565892961L;
 
     /**
-     * Factory to create the predicate.
+     * Creates the predicate.
      * <p>
      * If the collection is size zero, the predicate always returns true.
+     * </p>
      *
      * @param <T> the type that the predicate queries
      * @param predicates  the predicates to check, cloned, not null
@@ -56,9 +58,10 @@ public final class NonePredicate<T> extends AbstractQuantifierPredicate<T> {
     }
 
     /**
-     * Factory to create the predicate.
+     * Creates the predicate.
      * <p>
      * If the array is size zero, the predicate always returns true.
+     * </p>
      *
      * @param <T> the type that the predicate queries
      * @param predicates  the predicates to check, cloned, not null
@@ -71,7 +74,8 @@ public final class NonePredicate<T> extends AbstractQuantifierPredicate<T> {
         if (predicates.length == 0) {
             return TruePredicate.<T>truePredicate();
         }
-        return new NonePredicate<>(FunctorUtils.copy(predicates));
+        // <T> not needed in Eclipse but needed by the command line compiler
+        return new NonePredicate<T>(FunctorUtils.copy(predicates));
     }
 
     /**
@@ -91,9 +95,9 @@ public final class NonePredicate<T> extends AbstractQuantifierPredicate<T> {
      * @return true if none of decorated predicates return true
      */
     @Override
-    public boolean evaluate(final T object) {
+    public boolean test(final T object) {
         for (final Predicate<? super T> iPredicate : iPredicates) {
-            if (iPredicate.evaluate(object)) {
+            if (iPredicate.test(object)) {
                 return false;
             }
         }

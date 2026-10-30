@@ -111,7 +111,7 @@ public class PredicatedMap<K, V>
      */
     @Override
     protected V checkSetValue(final V value) {
-        if (!valuePredicate.evaluate(value)) {
+        if (!valuePredicate.test(value)) {
             throw new IllegalArgumentException("Cannot set value - Predicate rejected it");
         }
         return value;
@@ -143,7 +143,7 @@ public class PredicatedMap<K, V>
     }
 
     /**
-     * Read the map in using a custom routine.
+     * Deserializes the map in using a custom routine.
      *
      * @param in  the input stream
      * @throws IOException if an error occurs while reading from the stream
@@ -164,19 +164,19 @@ public class PredicatedMap<K, V>
      * @throws IllegalArgumentException if invalid
      */
     protected void validate(final K key, final V value) {
-        if (keyPredicate != null && !keyPredicate.evaluate(key)) {
+        if (keyPredicate != null && !keyPredicate.test(key)) {
             throw new IllegalArgumentException("Cannot add key - Predicate rejected it");
         }
-        if (valuePredicate != null && !valuePredicate.evaluate(value)) {
+        if (valuePredicate != null && !valuePredicate.test(value)) {
             throw new IllegalArgumentException("Cannot add value - Predicate rejected it");
         }
     }
 
     /**
-     * Write the map out using a custom routine.
+     * Serializes this object to an ObjectOutputStream.
      *
-     * @param out  the output stream
-     * @throws IOException if an error occurs while writing to the stream
+     * @param out the target ObjectOutputStream.
+     * @throws IOException thrown when an I/O errors occur writing to the target stream.
      * @since 3.1
      */
     private void writeObject(final ObjectOutputStream out) throws IOException {

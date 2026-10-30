@@ -37,7 +37,10 @@ import org.apache.commons.collections4.iterators.AbstractOrderedMapIteratorTest;
 import org.junit.jupiter.api.Test;
 
 /**
- * Abstract test class for {@link OrderedMap} methods and contracts.
+ * Tests {@link OrderedMap}.
+ *
+ * @param <K> the type of the keys in the maps tested.
+ * @param <V> the type of the values in the maps tested.
  */
 public abstract class AbstractOrderedMapTest<K, V> extends AbstractIterableMapTest<K, V> {
 
@@ -49,7 +52,7 @@ public abstract class AbstractOrderedMapTest<K, V> extends AbstractIterableMapTe
         @Override
         public Map<K, V> getConfirmedMap() {
             // assumes makeFullMapIterator() called first
-            return AbstractOrderedMapTest.this.getConfirmed();
+            return getConfirmed();
         }
 
         @Override
@@ -77,12 +80,12 @@ public abstract class AbstractOrderedMapTest<K, V> extends AbstractIterableMapTe
 
         @Override
         public boolean supportsRemove() {
-            return AbstractOrderedMapTest.this.isRemoveSupported();
+            return isRemoveSupported();
         }
 
         @Override
         public boolean supportsSetValue() {
-            return AbstractOrderedMapTest.this.isSetValueSupported();
+            return isSetValueSupported();
         }
 
         @Override
@@ -240,10 +243,8 @@ public abstract class AbstractOrderedMapTest<K, V> extends AbstractIterableMapTe
         if (!isAllowNullKey()) {
             final OrderedMap<K, V> finalOrdered = ordered;
             assertThrows(NullPointerException.class, () -> finalOrdered.previousKey(null));
-        } else {
-            if (!isAllowNullKey()) {
-                assertNull(ordered.previousKey(null));
-            }
+        } else if (!isAllowNullKey()) {
+            assertNull(ordered.previousKey(null));
         }
     }
 

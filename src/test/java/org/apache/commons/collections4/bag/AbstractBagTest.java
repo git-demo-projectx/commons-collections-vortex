@@ -43,7 +43,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
 
 /**
- * Abstract test class for {@link org.apache.commons.collections4.Bag Bag} methods and contracts.
+ * Tests {@link org.apache.commons.collections4.Bag Bag}.
  * <p>
  * To use, simply extend this class, and implement
  * the {@link #makeObject} method.
@@ -209,14 +209,14 @@ public abstract class AbstractBagTest<T> extends AbstractCollectionTest<T> {
 
     @Override
     public void resetEmpty() {
-        this.setCollection(CollectionBag.collectionBag(makeObject()));
-        this.setConfirmed(makeConfirmedCollection());
+        setCollection(CollectionBag.collectionBag(makeObject()));
+        setConfirmed(makeConfirmedCollection());
     }
 
     @Override
     public void resetFull() {
-        this.setCollection(CollectionBag.collectionBag(makeFullCollection()));
-        this.setConfirmed(makeConfirmedFullCollection());
+        setCollection(CollectionBag.collectionBag(makeFullCollection()));
+        setConfirmed(makeConfirmedFullCollection());
     }
 
     @Test

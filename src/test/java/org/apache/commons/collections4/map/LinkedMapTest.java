@@ -34,6 +34,9 @@ import org.junit.jupiter.api.Test;
 
 /**
  * JUnit tests.
+ *
+ * @param <K> the key type.
+ * @param <V> the value type.
  */
 public class LinkedMapTest<K, V> extends AbstractOrderedMapTest<K, V> {
 
@@ -45,7 +48,7 @@ public class LinkedMapTest<K, V> extends AbstractOrderedMapTest<K, V> {
 
         @Override
         public K[] getFullElements() {
-            return LinkedMapTest.this.getSampleKeys();
+            return getSampleKeys();
         }
 
         @Override
@@ -55,7 +58,7 @@ public class LinkedMapTest<K, V> extends AbstractOrderedMapTest<K, V> {
 
         @Override
         public boolean isNullSupported() {
-            return LinkedMapTest.this.isAllowNullKey();
+            return isAllowNullKey();
         }
 
         @Override

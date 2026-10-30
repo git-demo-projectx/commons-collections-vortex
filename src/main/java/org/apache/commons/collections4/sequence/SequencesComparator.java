@@ -52,10 +52,10 @@ import org.apache.commons.collections4.functors.DefaultEquator;
  * needed to transform the first sequence into the second one.
  * </p>
  *
+ * @param <T> the type of elements in the lists.
  * @see EditScript
  * @see EditCommand
  * @see CommandVisitor
- *
  * @since 4.0
  */
 public class SequencesComparator<T> {
@@ -195,14 +195,12 @@ public class SequencesComparator<T> {
                     script.append(new KeepCommand<>(sequence1.get(i)));
                     ++i;
                     ++j;
+                } else if (end1 - start1 > end2 - start2) {
+                    script.append(new DeleteCommand<>(sequence1.get(i)));
+                    ++i;
                 } else {
-                    if (end1 - start1 > end2 - start2) {
-                        script.append(new DeleteCommand<>(sequence1.get(i)));
-                        ++i;
-                    } else {
-                        script.append(new InsertCommand<>(sequence2.get(j)));
-                        ++j;
-                    }
+                    script.append(new InsertCommand<>(sequence2.get(j)));
+                    ++j;
                 }
             }
 

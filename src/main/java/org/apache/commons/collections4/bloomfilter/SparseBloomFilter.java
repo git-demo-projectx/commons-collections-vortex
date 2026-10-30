@@ -24,7 +24,7 @@ import java.util.function.LongPredicate;
 /**
  * A bloom filter using a TreeSet of integers to track enabled bits. This is a standard
  * implementation and should work well for most low cardinality Bloom filters.
- * @since 4.5
+ * @since 4.5.0
  */
 public final class SparseBloomFilter implements BloomFilter {
 
@@ -66,9 +66,9 @@ public final class SparseBloomFilter implements BloomFilter {
 
     @Override
     public long[] asBitMapArray() {
-        final long[] result = new long[BitMap.numberOfBitMaps(shape.getNumberOfBits())];
+        final long[] result = BitMaps.newBitMap(shape);
         for (final int i : indices) {
-            BitMap.set(result, i);
+            BitMaps.set(result, i);
         }
         return result;
     }
@@ -89,13 +89,13 @@ public final class SparseBloomFilter implements BloomFilter {
     }
 
     @Override
-    public boolean contains(final BitMapProducer bitMapProducer) {
-        return contains(IndexProducer.fromBitMapProducer(bitMapProducer));
+    public boolean contains(final BitMapExtractor bitMapExtractor) {
+        return contains(IndexExtractor.fromBitMapExtractor(bitMapExtractor));
     }
 
     @Override
-    public boolean contains(final IndexProducer indexProducer) {
-        return indexProducer.forEachIndex(indices::contains);
+    public boolean contains(final IndexExtractor indexExtractor) {
+        return indexExtractor.processIndices(indices::contains);
     }
 
     @Override
@@ -104,9 +104,57 @@ public final class SparseBloomFilter implements BloomFilter {
     }
 
     @Override
-    public boolean forEachBitMap(final LongPredicate consumer) {
+    public Shape getShape() {
+        return shape;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return indices.isEmpty();
+    }
+
+    @Override
+    public boolean merge(final BitMapExtractor bitMapExtractor) {
+        Objects.requireNonNull(bitMapExtractor, "bitMapExtractor");
+        return this.merge(IndexExtractor.fromBitMapExtractor(bitMapExtractor));
+    }
+
+    @Override
+    public boolean merge(final BloomFilter other) {
+        Objects.requireNonNull(other, "other");
+        final IndexExtractor indexExtractor = (other.characteristics() & SPARSE) != 0 ? (IndexExtractor) other : IndexExtractor.fromBitMapExtractor(other);
+        merge(indexExtractor);
+        return true;
+    }
+
+    @Override
+    public boolean merge(final Hasher hasher) {
+        Objects.requireNonNull(hasher, "hasher");
+        merge(hasher.indices(shape));
+        return true;
+    }
+
+    @Override
+    public boolean merge(final IndexExtractor indexExtractor) {
+        Objects.requireNonNull(indexExtractor, "indexExtractor");
+        indexExtractor.processIndices(this::add);
+        if (!indices.isEmpty()) {
+            if (indices.last() >= shape.getNumberOfBits()) {
+                throw new IllegalArgumentException(String.format("Value in list %s is greater than maximum value (%s)",
+                        indices.last(), shape.getNumberOfBits() - 1));
+            }
+            if (indices.first() < 0) {
+                throw new IllegalArgumentException(
+                        String.format("Value in list %s is less than 0", indices.first()));
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public boolean processBitMaps(final LongPredicate consumer) {
         Objects.requireNonNull(consumer, "consumer");
-        final int limit = BitMap.numberOfBitMaps(shape.getNumberOfBits());
+        final int limit = BitMaps.numberOfBitMaps(shape);
         /*
          * because our indices are always in order we can shorten the time necessary to
          * create the longs for the consumer
@@ -116,14 +164,14 @@ public final class SparseBloomFilter implements BloomFilter {
         // the bitmap we are working on
         int idx = 0;
         for (final int i : indices) {
-            while (BitMap.getLongIndex(i) != idx) {
+            while (BitMaps.getLongIndex(i) != idx) {
                 if (!consumer.test(bitMap)) {
                     return false;
                 }
                 bitMap = 0;
                 idx++;
             }
-            bitMap |= BitMap.getLongBit(i);
+            bitMap |= BitMaps.getLongBit(i);
         }
         // we fall through with data in the bitMap
         if (!consumer.test(bitMap)) {
@@ -142,59 +190,11 @@ public final class SparseBloomFilter implements BloomFilter {
     }
 
     @Override
-    public boolean forEachIndex(final IntPredicate consumer) {
+    public boolean processIndices(final IntPredicate consumer) {
         Objects.requireNonNull(consumer, "consumer");
         for (final int value : indices) {
             if (!consumer.test(value)) {
                 return false;
-            }
-        }
-        return true;
-    }
-
-    @Override
-    public Shape getShape() {
-        return shape;
-    }
-
-    @Override
-    public boolean isEmpty() {
-        return indices.isEmpty();
-    }
-
-    @Override
-    public boolean merge(final BitMapProducer bitMapProducer) {
-        Objects.requireNonNull(bitMapProducer, "bitMapProducer");
-        return this.merge(IndexProducer.fromBitMapProducer(bitMapProducer));
-    }
-
-    @Override
-    public boolean merge(final BloomFilter other) {
-        Objects.requireNonNull(other, "other");
-        final IndexProducer producer = (other.characteristics() & SPARSE) != 0 ? (IndexProducer) other : IndexProducer.fromBitMapProducer(other);
-        merge(producer);
-        return true;
-    }
-
-    @Override
-    public boolean merge(final Hasher hasher) {
-        Objects.requireNonNull(hasher, "hasher");
-        merge(hasher.indices(shape));
-        return true;
-    }
-
-    @Override
-    public boolean merge(final IndexProducer indexProducer) {
-        Objects.requireNonNull(indexProducer, "indexProducer");
-        indexProducer.forEachIndex(this::add);
-        if (!this.indices.isEmpty()) {
-            if (this.indices.last() >= shape.getNumberOfBits()) {
-                throw new IllegalArgumentException(String.format("Value in list %s is greater than maximum value (%s)",
-                        this.indices.last(), shape.getNumberOfBits() - 1));
-            }
-            if (this.indices.first() < 0) {
-                throw new IllegalArgumentException(
-                        String.format("Value in list %s is less than 0", this.indices.first()));
             }
         }
         return true;

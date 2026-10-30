@@ -117,15 +117,28 @@ public class HashSetValuedHashMap<K, V> extends AbstractSetValuedMap<K, V>
         return new HashSet<>(initialSetCapacity);
     }
 
-    private void readObject(final ObjectInputStream ois) throws IOException, ClassNotFoundException {
-        ois.defaultReadObject();
+    /**
+     * Deserializes an instance from an ObjectInputStream.
+     *
+     * @param in The source ObjectInputStream.
+     * @throws IOException            Any of the usual Input/Output related exceptions.
+     * @throws ClassNotFoundException A class of a serialized object cannot be found.
+     */
+    private void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
         setMap(new HashMap<>());
-        doReadObject(ois);
+        doReadObject(in);
     }
 
-    private void writeObject(final ObjectOutputStream oos) throws IOException {
-        oos.defaultWriteObject();
-        doWriteObject(oos);
+    /**
+     * Serializes this object to an ObjectOutputStream.
+     *
+     * @param out the target ObjectOutputStream.
+     * @throws IOException thrown when an I/O errors occur writing to the target stream.
+     */
+    private void writeObject(final ObjectOutputStream out) throws IOException {
+        out.defaultWriteObject();
+        doWriteObject(out);
     }
 
 }

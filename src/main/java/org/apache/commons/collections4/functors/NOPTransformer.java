@@ -23,6 +23,7 @@ import org.apache.commons.collections4.Transformer;
 /**
  * Transformer implementation that does nothing.
  *
+ * @param <T> the type of the input and result to the function.
  * @since 3.0
  */
 public class NOPTransformer<T> implements Transformer<T, T>, Serializable {
@@ -51,6 +52,11 @@ public class NOPTransformer<T> implements Transformer<T, T>, Serializable {
     private NOPTransformer() {
     }
 
+    /**
+     * Returns the singleton instance.
+     *
+     * @return the singleton instance.
+     */
     private Object readResolve() {
         return INSTANCE;
     }

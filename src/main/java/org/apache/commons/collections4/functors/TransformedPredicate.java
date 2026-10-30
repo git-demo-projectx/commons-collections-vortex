@@ -26,15 +26,16 @@ import org.apache.commons.collections4.Transformer;
  * Predicate implementation that transforms the given object before invoking
  * another {@code Predicate}.
  *
+ * @param <T> the type of the input to the predicate.
  * @since 3.1
  */
-public final class TransformedPredicate<T> implements PredicateDecorator<T>, Serializable {
+public final class TransformedPredicate<T> extends AbstractPredicate<T> implements PredicateDecorator<T>, Serializable {
 
     /** Serial version UID */
     private static final long serialVersionUID = -5596090919668315834L;
 
     /**
-     * Factory to create the predicate.
+     * Creates the predicate.
      *
      * @param <T> the type that the predicate queries
      * @param transformer  the transformer to call
@@ -68,19 +69,6 @@ public final class TransformedPredicate<T> implements PredicateDecorator<T>, Ser
     }
 
     /**
-     * Evaluates the predicate returning the result of the decorated predicate
-     * once the input has been transformed
-     *
-     * @param object  the input object which will be transformed
-     * @return true if decorated predicate returns true
-     */
-    @Override
-    public boolean evaluate(final T object) {
-        final T result = iTransformer.transform(object);
-        return iPredicate.evaluate(result);
-    }
-
-    /**
      * Gets the predicate being decorated.
      *
      * @return the predicate as the only element in an array
@@ -99,6 +87,19 @@ public final class TransformedPredicate<T> implements PredicateDecorator<T>, Ser
      */
     public Transformer<? super T, ? extends T> getTransformer() {
         return iTransformer;
+    }
+
+    /**
+     * Evaluates the predicate returning the result of the decorated predicate
+     * once the input has been transformed
+     *
+     * @param object  the input object which will be transformed
+     * @return true if decorated predicate returns true
+     */
+    @Override
+    public boolean test(final T object) {
+        final T result = iTransformer.apply(object);
+        return iPredicate.test(result);
     }
 
 }

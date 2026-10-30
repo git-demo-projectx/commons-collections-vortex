@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.IntFunction;
 
 import org.apache.commons.collections4.functors.EqualPredicate;
 import org.apache.commons.collections4.iterators.ArrayIterator;
@@ -659,6 +660,7 @@ public class IteratorUtils {
      * Finds the first element in the given iterator which matches the given predicate.
      * <p>
      * A {@code null} or empty iterator returns null.
+     * </p>
      *
      * @param <E> the element type
      * @param iterator  the iterator to search, may be null
@@ -668,17 +670,33 @@ public class IteratorUtils {
      * @since 4.1
      */
     public static <E> E find(final Iterator<E> iterator, final Predicate<? super E> predicate) {
-        Objects.requireNonNull(predicate, "predicate");
+        return find(iterator, predicate, null);
+    }
 
+    /**
+     * Finds the first element in the given iterator which matches the given predicate.
+     * <p>
+     * A {@code null} or empty iterator returns {@code defaultValue}.
+     * </p>
+     *
+     * @param <E>          the element type.
+     * @param iterator     the iterator to search, may be null.
+     * @param predicate    the predicate to use, must not be null.
+     * @param defaultValue the default value, may be null.
+     * @return the first element of the iterator which matches the predicate or null if none could be found.
+     * @throws NullPointerException if predicate is null.
+     */
+    private static <E> E find(final Iterator<E> iterator, final Predicate<? super E> predicate, final E defaultValue) {
+        Objects.requireNonNull(predicate, "predicate");
         if (iterator != null) {
             while (iterator.hasNext()) {
                 final E element = iterator.next();
-                if (predicate.evaluate(element)) {
+                if (predicate.test(element)) {
                     return element;
                 }
             }
         }
-        return null;
+        return defaultValue;
     }
 
     /**
@@ -712,11 +730,9 @@ public class IteratorUtils {
      */
     public static <E> void forEach(final Iterator<E> iterator, final Closure<? super E> closure) {
         Objects.requireNonNull(closure, "closure");
-
         if (iterator != null) {
             while (iterator.hasNext()) {
-                final E element = iterator.next();
-                closure.execute(element);
+                closure.accept(iterator.next());
             }
         }
     }
@@ -742,27 +758,45 @@ public class IteratorUtils {
                 if (!iterator.hasNext()) {
                     return element;
                 }
-                closure.execute(element);
+                closure.accept(element);
             }
         }
         return null;
     }
 
     /**
-     * Returns the {@code index}-th value in {@link Iterator}, throwing
-     * {@code IndexOutOfBoundsException} if there is no such element.
+     * Gets the {@code index}-th value in {@link Iterator}, throwing {@code IndexOutOfBoundsException} if there is no such element.
      * <p>
-     * The Iterator is advanced to {@code index} (or to the end, if
-     * {@code index} exceeds the number of entries) as a side effect of this method.
+     * The Iterator is advanced to {@code index} (or to the end, if {@code index} exceeds the number of entries) as a side effect of this method.
+     * </p>
      *
-     * @param <E> the type of object in the {@link Iterator}
-     * @param iterator  the iterator to get a value from
-     * @param index  the index to get
-     * @return the object at the specified index
-     * @throws IndexOutOfBoundsException if the index is invalid
+     * @param <E>      the type of object in the {@link Iterator}.
+     * @param iterator the iterator to get a value from.
+     * @param index    the index to get, 0-based.
+     * @return the object at the specified index.
+     * @throws IndexOutOfBoundsException if the index is invalid.
      * @since 4.1
      */
     public static <E> E get(final Iterator<E> iterator, final int index) {
+        return get(iterator, index, ioob -> {
+            throw new IndexOutOfBoundsException("Entry does not exist: " + ioob);
+        });
+    }
+
+    /**
+     * Gets the {@code index}-th value in {@link Iterator}, throwing {@code IndexOutOfBoundsException} if there is no such element.
+     * <p>
+     * The Iterator is advanced to {@code index} (or to the end, if {@code index} exceeds the number of entries) as a side effect of this method.
+     * </p>
+     *
+     * @param <E>             the type of object in the {@link Iterator}
+     * @param iterator        the iterator to get a value from
+     * @param index           the index to get, 0-based.
+     * @param defaultSupplier supplies a default value at an index.
+     * @return the object at the specified index
+     * @throws IndexOutOfBoundsException if the index is invalid
+     */
+    static <E> E get(final Iterator<E> iterator, final int index, final IntFunction<E> defaultSupplier) {
         int i = index;
         CollectionUtils.checkIndexBounds(i);
         while (iterator.hasNext()) {
@@ -772,7 +806,7 @@ public class IteratorUtils {
             }
             iterator.next();
         }
-        throw new IndexOutOfBoundsException("Entry does not exist: " + i);
+        return defaultSupplier.apply(i);
     }
 
     /**
@@ -862,7 +896,7 @@ public class IteratorUtils {
         if (iterator != null) {
             for (int index = 0; iterator.hasNext(); index++) {
                 final E element = iterator.next();
-                if (predicate.evaluate(element)) {
+                if (predicate.test(element)) {
                     return index;
                 }
             }
@@ -937,7 +971,7 @@ public class IteratorUtils {
         if (iterator != null) {
             while (iterator.hasNext()) {
                 final E element = iterator.next();
-                if (!predicate.evaluate(element)) {
+                if (!predicate.test(element)) {
                     return false;
                 }
             }
@@ -1314,7 +1348,7 @@ public class IteratorUtils {
         if (iterator != null) {
             while (iterator.hasNext()) {
                 final E element = iterator.next();
-                stringBuilder.append(transformer.transform(element));
+                stringBuilder.append(transformer.apply(element));
                 stringBuilder.append(delimiter);
             }
             if (stringBuilder.length() > prefix.length()) {
@@ -1402,7 +1436,6 @@ public class IteratorUtils {
         return new ZippingIterator<>(iterators);
     }
 
-    // Zipping
     /**
      * Returns an iterator that interleaves elements from the decorated iterators.
      *

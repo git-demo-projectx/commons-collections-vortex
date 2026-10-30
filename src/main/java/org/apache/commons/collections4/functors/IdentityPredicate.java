@@ -24,15 +24,16 @@ import org.apache.commons.collections4.Predicate;
  * Predicate implementation that returns true if the input is the same object
  * as the one stored in this predicate.
  *
+ * @param <T> the type of the input to the predicate.
  * @since 3.0
  */
-public final class IdentityPredicate<T> implements Predicate<T>, Serializable {
+public final class IdentityPredicate<T> extends AbstractPredicate<T> implements Serializable {
 
     /** Serial version UID */
     private static final long serialVersionUID = -89901658494523293L;
 
     /**
-     * Factory to create the identity predicate.
+     * Creates the identity predicate.
      *
      * @param <T> the type that the predicate queries
      * @param object  the object to compare to
@@ -59,18 +60,6 @@ public final class IdentityPredicate<T> implements Predicate<T>, Serializable {
     }
 
     /**
-     * Evaluates the predicate returning true if the input object is identical to
-     * the stored object.
-     *
-     * @param object  the input object
-     * @return true if input is the same object as the stored value
-     */
-    @Override
-    public boolean evaluate(final T object) {
-        return iValue == object;
-    }
-
-    /**
      * Gets the value.
      *
      * @return the value
@@ -78,6 +67,18 @@ public final class IdentityPredicate<T> implements Predicate<T>, Serializable {
      */
     public T getValue() {
         return iValue;
+    }
+
+    /**
+     * Evaluates the predicate returning true if the input object is identical to
+     * the stored object.
+     *
+     * @param object  the input object
+     * @return true if input is the same object as the stored value
+     */
+    @Override
+    public boolean test(final T object) {
+        return iValue == object;
     }
 
 }

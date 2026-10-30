@@ -25,6 +25,7 @@ import org.apache.commons.collections4.Transformer;
  * Transformer implementation that calls a Predicate using the input object
  * and then returns the result.
  *
+ * @param <T> the type of the input and result to the function.
  * @since 3.0
  */
 public class PredicateTransformer<T> implements Transformer<T, Boolean>, Serializable {
@@ -78,7 +79,7 @@ public class PredicateTransformer<T> implements Transformer<T, Boolean>, Seriali
      */
     @Override
     public Boolean transform(final T input) {
-        return Boolean.valueOf(iPredicate.evaluate(input));
+        return Boolean.valueOf(iPredicate.test(input));
     }
 
 }

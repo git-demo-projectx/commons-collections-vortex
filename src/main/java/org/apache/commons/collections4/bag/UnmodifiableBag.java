@@ -104,7 +104,7 @@ public final class UnmodifiableBag<E>
     }
 
     /**
-     * Read the collection in using a custom routine.
+     * Deserializes the collection in using a custom routine.
      *
      * @param in  the input stream
      * @throws IOException if an error occurs while reading from the stream
@@ -152,10 +152,10 @@ public final class UnmodifiableBag<E>
     }
 
     /**
-     * Write the collection out using a custom routine.
+     * Serializes this object to an ObjectOutputStream.
      *
-     * @param out  the output stream
-     * @throws IOException if an error occurs while writing to the stream
+     * @param out the target ObjectOutputStream.
+     * @throws IOException thrown when an I/O errors occur writing to the target stream.
      */
     private void writeObject(final ObjectOutputStream out) throws IOException {
         out.defaultWriteObject();

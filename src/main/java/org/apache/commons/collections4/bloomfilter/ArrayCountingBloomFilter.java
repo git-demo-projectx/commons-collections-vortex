@@ -46,8 +46,8 @@ import java.util.stream.IntStream;
  * consumption of approximately 8 GB.
  *
  * @see Shape
- * @see CellProducer
- * @since 4.5
+ * @see CellExtractor
+ * @since 4.5.0
  */
 public final class ArrayCountingBloomFilter implements CountingBloomFilter {
 
@@ -105,9 +105,9 @@ public final class ArrayCountingBloomFilter implements CountingBloomFilter {
     }
 
     @Override
-    public boolean add(final CellProducer other) {
+    public boolean add(final CellExtractor other) {
         Objects.requireNonNull(other, "other");
-        other.forEachCell(this::add);
+        other.processCells(this::add);
         return isValid();
     }
 
@@ -151,13 +151,13 @@ public final class ArrayCountingBloomFilter implements CountingBloomFilter {
     }
 
     @Override
-    public boolean contains(final BitMapProducer bitMapProducer) {
-        return contains(IndexProducer.fromBitMapProducer(bitMapProducer));
+    public boolean contains(final BitMapExtractor bitMapExtractor) {
+        return contains(IndexExtractor.fromBitMapExtractor(bitMapExtractor));
     }
 
     @Override
-    public boolean contains(final IndexProducer indexProducer) {
-        return indexProducer.forEachIndex(idx -> this.cells[idx] != 0);
+    public boolean contains(final IndexExtractor indexExtractor) {
+        return indexExtractor.processIndices(idx -> cells[idx] != 0);
     }
 
     @Override
@@ -166,64 +166,14 @@ public final class ArrayCountingBloomFilter implements CountingBloomFilter {
     }
 
     @Override
-    public boolean forEachBitMap(final LongPredicate consumer) {
-        Objects.requireNonNull(consumer, "consumer");
-        final int blocksm1 = BitMap.numberOfBitMaps(cells.length) - 1;
-        int i = 0;
-        long value;
-        // must break final block separate as the number of bits may not fall on the long boundary
-        for (int j = 0; j < blocksm1; j++) {
-            value = 0;
-            for (int k = 0; k < Long.SIZE; k++) {
-                if (cells[i++] != 0) {
-                    value |= BitMap.getLongBit(k);
-                }
-            }
-            if (!consumer.test(value)) {
-                return false;
-            }
-        }
-        // Final block
-        value = 0;
-        for (int k = 0; i < cells.length; k++) {
-            if (cells[i++] != 0) {
-                value |= BitMap.getLongBit(k);
-            }
-        }
-        return consumer.test(value);
-    }
-
-    @Override
-    public boolean forEachCell(final CellProducer.CellConsumer consumer) {
-        Objects.requireNonNull(consumer, "consumer");
-        for (int i = 0; i < cells.length; i++) {
-            if (cells[i] != 0 && !consumer.test(i, cells[i])) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    @Override
-    public boolean forEachIndex(final IntPredicate consumer) {
-        Objects.requireNonNull(consumer, "consumer");
-        for (int i = 0; i < cells.length; i++) {
-            if (cells[i] != 0 && !consumer.test(i)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    @Override
     public int getMaxCell() {
         return Integer.MAX_VALUE;
     }
 
     @Override
-    public int getMaxInsert(final CellProducer cellProducer) {
-        final int[] max = {Integer.MAX_VALUE};
-        cellProducer.forEachCell( (x, y) -> {
+    public int getMaxInsert(final CellExtractor cellExtractor) {
+        final int[] max = { Integer.MAX_VALUE };
+        cellExtractor.processCells((x, y) -> {
             final int count = cells[x] / y;
             if (count < max[0]) {
                 max[0] = count;
@@ -250,7 +200,7 @@ public final class ArrayCountingBloomFilter implements CountingBloomFilter {
      * generated invalid cells can be reversed by using the complement of the
      * original operation with the same Bloom filter. This will restore the cells
      * to the state prior to the invalid operation. Cells can then be extracted
-     * using {@link #forEachCell(CellConsumer)}.</p>
+     * using {@link #processCells(CellPredicate)}.</p>
      */
     @Override
     public boolean isValid() {
@@ -258,9 +208,59 @@ public final class ArrayCountingBloomFilter implements CountingBloomFilter {
     }
 
     @Override
-    public boolean subtract(final CellProducer other) {
+    public boolean processBitMaps(final LongPredicate consumer) {
+        Objects.requireNonNull(consumer, "consumer");
+        final int blocksm1 = BitMaps.numberOfBitMaps(cells.length) - 1;
+        int i = 0;
+        long value;
+        // must break final block separate as the number of bits may not fall on the long boundary
+        for (int j = 0; j < blocksm1; j++) {
+            value = 0;
+            for (int k = 0; k < Long.SIZE; k++) {
+                if (cells[i++] != 0) {
+                    value |= BitMaps.getLongBit(k);
+                }
+            }
+            if (!consumer.test(value)) {
+                return false;
+            }
+        }
+        // Final block
+        value = 0;
+        for (int k = 0; i < cells.length; k++) {
+            if (cells[i++] != 0) {
+                value |= BitMaps.getLongBit(k);
+            }
+        }
+        return consumer.test(value);
+    }
+
+    @Override
+    public boolean processCells(final CellPredicate consumer) {
+        Objects.requireNonNull(consumer, "consumer");
+        for (int i = 0; i < cells.length; i++) {
+            if (cells[i] != 0 && !consumer.test(i, cells[i])) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public boolean processIndices(final IntPredicate consumer) {
+        Objects.requireNonNull(consumer, "consumer");
+        for (int i = 0; i < cells.length; i++) {
+            if (cells[i] != 0 && !consumer.test(i)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public boolean subtract(final CellExtractor other) {
         Objects.requireNonNull(other, "other");
-        other.forEachCell(this::subtract);
+        other.processCells(this::subtract);
         return isValid();
     }
 

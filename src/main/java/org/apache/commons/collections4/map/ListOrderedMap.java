@@ -97,7 +97,7 @@ public class ListOrderedMap<K, V>
 
         @Override
         public void clear() {
-            this.parent.clear();
+            parent.clear();
         }
 
         @Override
@@ -131,7 +131,7 @@ public class ListOrderedMap<K, V>
 
         @Override
         public boolean isEmpty() {
-            return this.parent.isEmpty();
+            return parent.isEmpty();
         }
 
         @Override
@@ -155,7 +155,7 @@ public class ListOrderedMap<K, V>
 
         @Override
         public int size() {
-            return this.parent.size();
+            return parent.size();
         }
 
         @Override
@@ -174,12 +174,12 @@ public class ListOrderedMap<K, V>
 
         @Override
         public void clear() {
-            this.parent.clear();
+            parent.clear();
         }
 
         @Override
         public boolean contains(final Object value) {
-            return this.parent.containsKey(value);
+            return parent.containsKey(value);
         }
 
         @Override
@@ -194,7 +194,7 @@ public class ListOrderedMap<K, V>
 
         @Override
         public int size() {
-            return this.parent.size();
+            return parent.size();
         }
     }
 
@@ -334,17 +334,17 @@ public class ListOrderedMap<K, V>
 
         @Override
         public void clear() {
-            this.parent.clear();
+            parent.clear();
         }
 
         @Override
         public boolean contains(final Object value) {
-            return this.parent.containsValue(value);
+            return parent.containsValue(value);
         }
 
         @Override
         public V get(final int index) {
-            return this.parent.getValue(index);
+            return parent.getValue(index);
         }
 
         @Override
@@ -359,17 +359,17 @@ public class ListOrderedMap<K, V>
 
         @Override
         public V remove(final int index) {
-            return this.parent.remove(index);
+            return parent.remove(index);
         }
 
         @Override
         public V set(final int index, final V value) {
-            return this.parent.setValue(index, value);
+            return parent.setValue(index, value);
         }
 
         @Override
         public int size() {
-            return this.parent.size();
+            return parent.size();
         }
     }
 
@@ -452,7 +452,7 @@ public class ListOrderedMap<K, V>
      */
     @Override
     public Set<Map.Entry<K, V>> entrySet() {
-        return new EntrySetView<>(this, this.insertOrder);
+        return new EntrySetView<>(this, insertOrder);
     }
 
     /**
@@ -669,7 +669,7 @@ public class ListOrderedMap<K, V>
     }
 
     /**
-     * Read the map in using a custom routine.
+     * Deserializes the map in using a custom routine.
      *
      * @param in  the input stream
      * @throws IOException if an error occurs while reading from the stream
@@ -777,10 +777,10 @@ public class ListOrderedMap<K, V>
     }
 
     /**
-     * Write the map out using a custom routine.
+     * Serializes this object to an ObjectOutputStream.
      *
-     * @param out  the output stream
-     * @throws IOException if an error occurs while writing to the stream
+     * @param out the target ObjectOutputStream.
+     * @throws IOException thrown when an I/O errors occur writing to the target stream.
      * @since 3.1
      */
     private void writeObject(final ObjectOutputStream out) throws IOException {

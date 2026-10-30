@@ -50,17 +50,27 @@ public class HashBag<E> extends AbstractMapBag<E> implements Serializable {
     }
 
     /**
-     * Constructs a bag containing all the members of the given collection.
+     * Constructs a bag containing all the members of the given Collection.
      *
-     * @param coll  a collection to copy into this bag
+     * @param collection a collection to copy into this bag.
      */
-    public HashBag(final Collection<? extends E> coll) {
+    public HashBag(final Collection<? extends E> collection) {
         this();
-        addAll(coll);
+        addAll(collection);
     }
 
     /**
-     * Read the bag in using a custom routine.
+     * Constructs a bag containing all the members of the given Iterable.
+     *
+     * @param iterable an iterable to copy into this bag.
+     * @since 4.5.0-M3
+     */
+    public HashBag(final Iterable<? extends E> iterable) {
+        super(new HashMap<>(), iterable);
+    }
+
+    /**
+     * Deserializes the bag in using a custom routine.
      *
      * @param in  the input stream
      * @throws IOException if an error occurs while reading from the stream
@@ -72,10 +82,10 @@ public class HashBag<E> extends AbstractMapBag<E> implements Serializable {
     }
 
     /**
-     * Write the bag out using a custom routine.
+     * Serializes this object to an ObjectOutputStream.
      *
-     * @param out  the output stream
-     * @throws IOException if an error occurs while writing to the stream
+     * @param out the target ObjectOutputStream.
+     * @throws IOException thrown when an I/O errors occur writing to the target stream.
      */
     private void writeObject(final ObjectOutputStream out) throws IOException {
         out.defaultWriteObject();
