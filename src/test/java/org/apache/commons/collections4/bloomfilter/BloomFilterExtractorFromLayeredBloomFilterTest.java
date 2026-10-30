@@ -22,7 +22,7 @@ import org.apache.commons.lang3.ArrayUtils;
 public class BloomFilterExtractorFromLayeredBloomFilterTest extends AbstractBloomFilterExtractorTest {
 
     @Override
-    protected BloomFilterExtractor createUnderTest(final BloomFilter... filters) {
+    protected BloomFilterExtractor createUnderTest(final BloomFilter<?>... filters) {
         final Builder<SimpleBloomFilter> builder = LayerManager.<SimpleBloomFilter>builder();
         if (!ArrayUtils.isEmpty(filters)) {
             // Avoid an NPE in test code and let the domain classes decide what to do when there is no supplier set.
@@ -30,8 +30,8 @@ public class BloomFilterExtractorFromLayeredBloomFilterTest extends AbstractBloo
         }
         final LayerManager<SimpleBloomFilter> layerManager = builder.setExtendCheck(LayerManager.ExtendCheck.advanceOnPopulated())
                 .setCleanup(LayerManager.Cleanup.noCleanup()).get();
-        final LayeredBloomFilter underTest = new LayeredBloomFilter(filters[0].getShape(), layerManager);
-        for (final BloomFilter bf : filters) {
+        final LayeredBloomFilter<SimpleBloomFilter> underTest = new LayeredBloomFilter<>(filters[0].getShape(), layerManager);
+        for (final BloomFilter<?> bf : filters) {
             underTest.merge(bf);
         }
         return underTest;

@@ -33,7 +33,7 @@ public class BloomFilterExtractorTest {
 
     @Test
     public void testFromBloomFilterArray() {
-        assertThrows(NullPointerException.class, () -> BloomFilterExtractor.fromBloomFilterArray((BloomFilter[]) null));
+        assertThrows(NullPointerException.class, () -> BloomFilterExtractor.fromBloomFilterArray((BloomFilter<?>[]) null));
     }
 
 }

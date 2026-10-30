@@ -28,28 +28,28 @@ import org.junit.jupiter.api.Test;
  */
 public class SetOperationsTest {
 
-    private static void assertSymmetricOperation(final double expected, final ToDoubleBiFunction<BloomFilter, BloomFilter> operation,
-            final BloomFilter filter1, final BloomFilter filter2) {
+    private static void assertSymmetricOperation(final double expected, final ToDoubleBiFunction<BloomFilter<?>, BloomFilter<?>> operation,
+            final BloomFilter<?> filter1, final BloomFilter<?> filter2) {
         assertEquals(expected, operation.applyAsDouble(filter1, filter2), "op(filter1, filter2)");
         assertEquals(expected, operation.applyAsDouble(filter2, filter1), "op(filter2, filter1)");
     }
 
-    private static void assertSymmetricOperation(final int expected, final ToIntBiFunction<BloomFilter, BloomFilter> operation,
-            final BloomFilter filter1, final BloomFilter filter2) {
+    private static void assertSymmetricOperation(final int expected, final ToIntBiFunction<BloomFilter<?>, BloomFilter<?>> operation,
+            final BloomFilter<?> filter1, final BloomFilter<?> filter2) {
         assertEquals(expected, operation.applyAsInt(filter1, filter2), "op(filter1, filter2)");
         assertEquals(expected, operation.applyAsInt(filter2, filter1), "op(filter2, filter1)");
     }
 
     private final Shape shape = Shape.fromKM(17, 72);
 
-    private BloomFilter createFilter(final Shape shape, final Hasher hasher) {
-        final BloomFilter bf = new SimpleBloomFilter(shape);
+    private BloomFilter<?> createFilter(final Shape shape, final Hasher hasher) {
+        final BloomFilter<?> bf = new SimpleBloomFilter(shape);
         bf.merge(hasher);
         return bf;
     }
 
-    private BloomFilter createFilter(final Shape shape, final IndexExtractor indexExtractor) {
-        final BloomFilter bf = new SparseBloomFilter(shape);
+    private BloomFilter<?> createFilter(final Shape shape, final IndexExtractor indexExtractor) {
+        final BloomFilter<?> bf = new SparseBloomFilter(shape);
         bf.merge(indexExtractor);
         return bf;
     }
@@ -57,8 +57,8 @@ public class SetOperationsTest {
     @Test
     public final void testAndCardinality() {
         final Shape shape = Shape.fromKM(3, 128);
-        BloomFilter filter1 = createFilter(shape, IndexExtractor.fromIndexArray(1, 63, 64));
-        BloomFilter filter2 = createFilter(shape, IndexExtractor.fromIndexArray(5, 64, 69));
+        BloomFilter<?> filter1 = createFilter(shape, IndexExtractor.fromIndexArray(1, 63, 64));
+        BloomFilter<?> filter2 = createFilter(shape, IndexExtractor.fromIndexArray(5, 64, 69));
         assertSymmetricOperation(1, SetOperations::andCardinality, filter1, filter2);
 
         filter1 = createFilter(shape, IndexExtractor.fromIndexArray(1, 63));
@@ -74,8 +74,8 @@ public class SetOperationsTest {
     public final void testAndCardinalityWithDifferentLengthFilters() {
         final Shape shape = Shape.fromKM(3, 128);
         final Shape shape2 = Shape.fromKM(3, 192);
-        BloomFilter filter1 = createFilter(shape, IndexExtractor.fromIndexArray(1, 63, 64));
-        BloomFilter filter2 = createFilter(shape2, IndexExtractor.fromIndexArray(5, 64, 169));
+        BloomFilter<?> filter1 = createFilter(shape, IndexExtractor.fromIndexArray(1, 63, 64));
+        BloomFilter<?> filter2 = createFilter(shape2, IndexExtractor.fromIndexArray(5, 64, 169));
         assertSymmetricOperation(1, SetOperations::andCardinality, filter1, filter2);
 
         filter1 = createFilter(shape, IndexExtractor.fromIndexArray(1, 63));
@@ -108,8 +108,8 @@ public class SetOperationsTest {
     @Test
     public final void testCosineDistance() {
 
-        BloomFilter filter1 = createFilter(shape, TestingHashers.FROM1);
-        BloomFilter filter2 = createFilter(shape, TestingHashers.FROM1);
+        BloomFilter<?> filter1 = createFilter(shape, TestingHashers.FROM1);
+        BloomFilter<?> filter2 = createFilter(shape, TestingHashers.FROM1);
 
         // identical filters should have no distance.
         double expected = 0;
@@ -155,8 +155,8 @@ public class SetOperationsTest {
      */
     @Test
     public final void testCosineSimilarity() {
-        BloomFilter filter1 = createFilter(shape, TestingHashers.FROM1);
-        BloomFilter filter2 = createFilter(shape, TestingHashers.FROM1);
+        BloomFilter<?> filter1 = createFilter(shape, TestingHashers.FROM1);
+        BloomFilter<?> filter2 = createFilter(shape, TestingHashers.FROM1);
 
         int dotProduct = /* [1..17] & [1..17] = [1..17] = */ 17;
         int cardinalityA = 17;
@@ -175,7 +175,7 @@ public class SetOperationsTest {
         filter1 = new SimpleBloomFilter(shape);
         filter2 = new SimpleBloomFilter(shape);
         // build a filter
-        final BloomFilter filter3 = createFilter(shape, TestingHashers.FROM1);
+        final BloomFilter<?> filter3 = createFilter(shape, TestingHashers.FROM1);
         assertSymmetricOperation(0.0, SetOperations::cosineSimilarity, filter1, filter2);
         assertSymmetricOperation(0.0, SetOperations::cosineSimilarity, filter1, filter3);
     }
@@ -185,8 +185,8 @@ public class SetOperationsTest {
      */
     @Test
     public final void testHammingDistance() {
-        final BloomFilter filter1 = createFilter(shape, TestingHashers.FROM1);
-        BloomFilter filter2 = createFilter(shape, TestingHashers.FROM1);
+        final BloomFilter<?> filter1 = createFilter(shape, TestingHashers.FROM1);
+        BloomFilter<?> filter2 = createFilter(shape, TestingHashers.FROM1);
 
         int hammingDistance = /* [1..17] ^ [1..17] = [] = */ 0;
         assertSymmetricOperation(hammingDistance, SetOperations::hammingDistance, filter1, filter2);
@@ -201,8 +201,8 @@ public class SetOperationsTest {
      */
     @Test
     public final void testJaccardDistance() {
-        BloomFilter filter1 = createFilter(shape, TestingHashers.FROM1);
-        BloomFilter filter2 = createFilter(shape, TestingHashers.FROM1);
+        BloomFilter<?> filter1 = createFilter(shape, TestingHashers.FROM1);
+        BloomFilter<?> filter2 = createFilter(shape, TestingHashers.FROM1);
 
         // 1 - jaccardSimilarity -- see jaccardSimilarityTest
         assertSymmetricOperation(0.0, SetOperations::jaccardDistance, filter1, filter2);
@@ -216,7 +216,7 @@ public class SetOperationsTest {
         // test no values
         filter1 = new SimpleBloomFilter(shape);
         filter2 = new SimpleBloomFilter(shape);
-        final BloomFilter filter3 = createFilter(shape, TestingHashers.FROM1);
+        final BloomFilter<?> filter3 = createFilter(shape, TestingHashers.FROM1);
 
         // 1 - jaccardSimilarity -- see jaccardSimilarityTest
         assertSymmetricOperation(1.0, SetOperations::jaccardDistance, filter1, filter2);
@@ -228,8 +228,8 @@ public class SetOperationsTest {
      */
     @Test
     public final void testJaccardSimilarity() {
-        BloomFilter filter1 = createFilter(shape, TestingHashers.FROM1);
-        BloomFilter filter2 = createFilter(shape, TestingHashers.FROM1);
+        BloomFilter<?> filter1 = createFilter(shape, TestingHashers.FROM1);
+        BloomFilter<?> filter2 = createFilter(shape, TestingHashers.FROM1);
 
         double intersection = /* [1..17] & [1..17] = [1..17] = */ 17.0;
         int union = /* [1..17] | [1..17] = [1..17] = */ 17;
@@ -256,8 +256,8 @@ public class SetOperationsTest {
     @Test
     public final void testOrCardinality() {
         final Shape shape = Shape.fromKM(3, 128);
-        BloomFilter filter1 = createFilter(shape, IndexExtractor.fromIndexArray(1, 63, 64));
-        BloomFilter filter2 = createFilter(shape, IndexExtractor.fromIndexArray(5, 64, 69));
+        BloomFilter<?> filter1 = createFilter(shape, IndexExtractor.fromIndexArray(1, 63, 64));
+        BloomFilter<?> filter2 = createFilter(shape, IndexExtractor.fromIndexArray(5, 64, 69));
         assertSymmetricOperation(5, SetOperations::orCardinality, filter1, filter2);
 
         filter1 = createFilter(shape, IndexExtractor.fromIndexArray(1, 63));
@@ -273,8 +273,8 @@ public class SetOperationsTest {
     public final void testOrCardinalityWithDifferentLengthFilters() {
         final Shape shape = Shape.fromKM(3, 128);
         final Shape shape2 = Shape.fromKM(3, 192);
-        BloomFilter filter1 = createFilter(shape, IndexExtractor.fromIndexArray(1, 63, 64));
-        BloomFilter filter2 = createFilter(shape2, IndexExtractor.fromIndexArray(5, 64, 169));
+        BloomFilter<?> filter1 = createFilter(shape, IndexExtractor.fromIndexArray(1, 63, 64));
+        BloomFilter<?> filter2 = createFilter(shape2, IndexExtractor.fromIndexArray(5, 64, 169));
         assertSymmetricOperation(5, SetOperations::orCardinality, filter1, filter2);
 
         filter1 = createFilter(shape, IndexExtractor.fromIndexArray(1, 63));
@@ -289,8 +289,8 @@ public class SetOperationsTest {
     @Test
     public final void testXorCardinality() {
         final Shape shape = Shape.fromKM(3, 128);
-        BloomFilter filter1 = createFilter(shape, IndexExtractor.fromIndexArray(1, 63, 64));
-        BloomFilter filter2 = createFilter(shape, IndexExtractor.fromIndexArray(5, 64, 69));
+        BloomFilter<?> filter1 = createFilter(shape, IndexExtractor.fromIndexArray(1, 63, 64));
+        BloomFilter<?> filter2 = createFilter(shape, IndexExtractor.fromIndexArray(5, 64, 69));
         assertSymmetricOperation(4, SetOperations::xorCardinality, filter1, filter2);
 
         filter1 = createFilter(shape, IndexExtractor.fromIndexArray(1, 63));
@@ -312,8 +312,8 @@ public class SetOperationsTest {
         final Shape shape = Shape.fromKM(3, 128);
         final Shape shape2 = Shape.fromKM(3, 192);
 
-        BloomFilter filter1 = createFilter(shape, IndexExtractor.fromIndexArray(1, 63, 64));
-        BloomFilter filter2 = createFilter(shape2, IndexExtractor.fromIndexArray(5, 64, 169));
+        BloomFilter<?> filter1 = createFilter(shape, IndexExtractor.fromIndexArray(1, 63, 64));
+        BloomFilter<?> filter2 = createFilter(shape2, IndexExtractor.fromIndexArray(5, 64, 169));
         assertSymmetricOperation(4, SetOperations::xorCardinality, filter1, filter2);
 
         filter1 = createFilter(shape, IndexExtractor.fromIndexArray(1, 63));

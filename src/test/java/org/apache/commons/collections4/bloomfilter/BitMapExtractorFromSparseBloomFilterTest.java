@@ -28,7 +28,7 @@ public class BitMapExtractorFromSparseBloomFilterTest extends AbstractBitMapExtr
     @Override
     protected BitMapExtractor createExtractor() {
         final Hasher hasher = new IncrementingHasher(0, 1);
-        final BloomFilter bf = new SparseBloomFilter(shape);
+        final BloomFilter<?> bf = new SparseBloomFilter(shape);
         bf.merge(hasher);
         return bf;
     }
