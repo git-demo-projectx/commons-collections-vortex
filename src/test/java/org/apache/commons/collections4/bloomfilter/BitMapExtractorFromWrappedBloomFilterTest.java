@@ -22,27 +22,14 @@ public class BitMapExtractorFromWrappedBloomFilterTest extends AbstractBitMapExt
 
     @Override
     protected BitMapExtractor createEmptyExtractor() {
-        return new WrappedBloomFilter(new DefaultBloomFilterTest.SparseDefaultBloomFilter(shape)) {
-            @Override
-            public BloomFilter copy() {
-                final BloomFilter result = new DefaultBloomFilterTest.SparseDefaultBloomFilter(shape);
-                result.merge(getWrapped());
-                return result;
-            }
-        };
+        return new WrappedBloomFilterTest.Fixture(new DefaultBloomFilterTest.SparseDefaultBloomFilter(shape));
     }
 
     @Override
     protected BitMapExtractor createExtractor() {
         final Hasher hasher = new IncrementingHasher(0, 1);
-        final BloomFilter bf = new WrappedBloomFilter(new DefaultBloomFilterTest.SparseDefaultBloomFilter(shape)) {
-            @Override
-            public BloomFilter copy() {
-                final BloomFilter result = new DefaultBloomFilterTest.SparseDefaultBloomFilter(shape);
-                result.merge(getWrapped());
-                return result;
-            }
-        };
+        final WrappedBloomFilterTest.Fixture bf = new WrappedBloomFilterTest.Fixture(
+                new DefaultBloomFilterTest.SparseDefaultBloomFilter(shape));
         bf.merge(hasher);
         return bf;
     }

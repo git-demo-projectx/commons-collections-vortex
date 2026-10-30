@@ -30,7 +30,7 @@ import org.junit.jupiter.api.Test;
  * Tests for the {@link BloomFilter}.
  */
 public class DefaultBloomFilterTest extends AbstractBloomFilterTest<DefaultBloomFilterTest.AbstractDefaultBloomFilter> {
-    abstract static class AbstractDefaultBloomFilter implements BloomFilter {
+    abstract static class AbstractDefaultBloomFilter implements BloomFilter<AbstractDefaultBloomFilter> {
         private final Shape shape;
         protected TreeSet<Integer> indices;
 
