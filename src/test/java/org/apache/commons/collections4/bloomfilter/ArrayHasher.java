@@ -25,7 +25,7 @@ import java.util.function.IntPredicate;
  * <p>To be used for testing only.</p>
  */
 public final class ArrayHasher implements Hasher {
-    private final class Producer implements IndexProducer {
+    private final class Producer implements IndexExtractor {
         Shape shape;
 
         Producer(final Shape shape) {
@@ -33,7 +33,7 @@ public final class ArrayHasher implements Hasher {
         }
 
         @Override
-        public boolean forEachIndex(final IntPredicate consumer) {
+        public boolean processIndices(final IntPredicate consumer) {
             Objects.requireNonNull(consumer, "consumer");
 
             int pos = 0;
@@ -55,7 +55,7 @@ public final class ArrayHasher implements Hasher {
     }
 
     @Override
-    public IndexProducer indices(final Shape shape) {
+    public IndexExtractor indices(final Shape shape) {
         Objects.requireNonNull(shape, "shape");
         return new Producer(shape);
     }
