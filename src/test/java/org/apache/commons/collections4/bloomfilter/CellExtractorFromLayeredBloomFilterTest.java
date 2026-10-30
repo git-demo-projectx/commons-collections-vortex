@@ -28,7 +28,7 @@ public class CellExtractorFromLayeredBloomFilterTest extends AbstractCellExtract
     @Override
     protected CellExtractor createExtractor() {
         final Hasher hasher = new IncrementingHasher(3, 2);
-        final BloomFilter bf = LayeredBloomFilterTest.fixed(shape, 10);
+        final BloomFilter<?> bf = LayeredBloomFilterTest.fixed(shape, 10);
         bf.merge(hasher);
         return CellExtractor.from(bf);
     }

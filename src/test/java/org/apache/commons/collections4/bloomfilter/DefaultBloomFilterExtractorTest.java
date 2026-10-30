@@ -19,9 +19,9 @@ package org.apache.commons.collections4.bloomfilter;
 public class DefaultBloomFilterExtractorTest extends AbstractBloomFilterExtractorTest {
 
     @Override
-    protected BloomFilterExtractor createUnderTest(final BloomFilter... filters) {
+    protected BloomFilterExtractor createUnderTest(final BloomFilter<?>... filters) {
         return bloomFilterPredicate -> {
-            for (final BloomFilter bf : filters) {
+            for (final BloomFilter<?> bf : filters) {
                 if (!bloomFilterPredicate.test(bf)) {
                     return false;
                 }
