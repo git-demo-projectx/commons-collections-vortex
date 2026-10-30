@@ -34,7 +34,7 @@ public class SparseBloomFilterTest extends AbstractBloomFilterTest<SparseBloomFi
     @Test
     public void testBitMapExtractorEdgeCases() {
         int[] values = {1, 2, 3, 4, 5, 6, 7, 8, 9, 65, 66, 67, 68, 69, 70, 71};
-        BloomFilter bf = createFilter(getTestShape(), IndexExtractor.fromIndexArray(values));
+        BloomFilter<?> bf = createFilter(getTestShape(), IndexExtractor.fromIndexArray(values));
 
         // verify exit early before bitmap boundary
         final int[] passes = new int[1];
@@ -83,8 +83,8 @@ public class SparseBloomFilterTest extends AbstractBloomFilterTest<SparseBloomFi
 
     @Test
     public void testBloomFilterBasedMergeEdgeCases() {
-        final BloomFilter bf1 = createEmptyFilter(getTestShape());
-        final BloomFilter bf2 = new SimpleBloomFilter(getTestShape());
+        final BloomFilter<?> bf1 = createEmptyFilter(getTestShape());
+        final BloomFilter<?> bf2 = new SimpleBloomFilter(getTestShape());
         bf2.merge(TestingHashers.FROM1);
         bf1.merge(bf2);
         assertTrue(bf2.processBitMapPairs(bf1, (x, y) -> x == y));

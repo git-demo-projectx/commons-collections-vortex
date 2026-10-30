@@ -30,7 +30,7 @@ import org.junit.jupiter.api.Test;
  * Tests for the {@link BloomFilter}.
  */
 public class DefaultBloomFilterTest extends AbstractBloomFilterTest<DefaultBloomFilterTest.AbstractDefaultBloomFilter> {
-    abstract static class AbstractDefaultBloomFilter implements BloomFilter {
+    abstract static class AbstractDefaultBloomFilter implements BloomFilter<AbstractDefaultBloomFilter> {
         private final Shape shape;
         protected TreeSet<Integer> indices;
 
@@ -136,8 +136,8 @@ public class DefaultBloomFilterTest extends AbstractBloomFilterTest<DefaultBloom
         }
 
         @Override
-        public AbstractDefaultBloomFilter copy() {
-            final AbstractDefaultBloomFilter result = new NonSparseDefaultBloomFilter(getShape());
+        public NonSparseDefaultBloomFilter copy() {
+            final NonSparseDefaultBloomFilter result = new NonSparseDefaultBloomFilter(getShape());
             result.indices.addAll(indices);
             return result;
         }
@@ -158,8 +158,8 @@ public class DefaultBloomFilterTest extends AbstractBloomFilterTest<DefaultBloom
         }
 
         @Override
-        public AbstractDefaultBloomFilter copy() {
-            final AbstractDefaultBloomFilter result = new SparseDefaultBloomFilter(getShape());
+        public SparseDefaultBloomFilter copy() {
+            final SparseDefaultBloomFilter result = new SparseDefaultBloomFilter(getShape());
             result.indices.addAll(indices);
             return result;
         }
@@ -183,7 +183,7 @@ public class DefaultBloomFilterTest extends AbstractBloomFilterTest<DefaultBloom
         final Shape shape = Shape.fromKM(3, 150);
         final AbstractDefaultBloomFilter filter = new SparseDefaultBloomFilter(shape);
         final AbstractDefaultBloomFilter filter2 = createFilter(shape, new IncrementingHasher(0, 1));
-        final BloomFilter newFilter = filter.copy();
+        final BloomFilter<?> newFilter = filter.copy();
         newFilter.merge(filter2);
         assertEquals(3, newFilter.cardinality());
     }
@@ -192,7 +192,7 @@ public class DefaultBloomFilterTest extends AbstractBloomFilterTest<DefaultBloom
     public void testEstimateLargeN() {
         final Shape s = Shape.fromKM(1, Integer.MAX_VALUE);
         // create a very large filter with Integer.MAX_VALUE-1 bits set.
-        final BloomFilter bf1 = new SimpleBloomFilter(s);
+        final BloomFilter<?> bf1 = new SimpleBloomFilter(s);
         bf1.merge((BitMapExtractor) predicate -> {
             int limit = Integer.MAX_VALUE - 1;
             while (limit > 64) {
@@ -214,7 +214,7 @@ public class DefaultBloomFilterTest extends AbstractBloomFilterTest<DefaultBloom
     @Test
     public void testEstimateNWithBrokenCardinality() {
         // build a filter
-        final BloomFilter filter1 = TestingHashers.populateEntireFilter(new BrokenCardinality(getTestShape()));
+        final BloomFilter<?> filter1 = TestingHashers.populateEntireFilter(new BrokenCardinality(getTestShape()));
         assertThrows(IllegalArgumentException.class, () -> filter1.estimateN());
     }
 
@@ -222,7 +222,7 @@ public class DefaultBloomFilterTest extends AbstractBloomFilterTest<DefaultBloom
     public void testHasherBasedMergeWithDifferingSparseness() {
         final Hasher hasher = new IncrementingHasher(1, 1);
 
-        BloomFilter bf1 = new NonSparseDefaultBloomFilter(getTestShape());
+        BloomFilter<?> bf1 = new NonSparseDefaultBloomFilter(getTestShape());
         bf1.merge(hasher);
         assertTrue(BitMapExtractor.fromIndexExtractor(hasher.indices(getTestShape()), getTestShape().getNumberOfBits())
                 .processBitMapPairs(bf1, (x, y) -> x == y));
@@ -237,7 +237,7 @@ public class DefaultBloomFilterTest extends AbstractBloomFilterTest<DefaultBloom
     public void testIntersectionLimit() {
         final Shape s = Shape.fromKM(1, Integer.MAX_VALUE);
         // create a very large filter with Integer.MAX_VALUE-1 bit set.
-        final BloomFilter bf1 = new SimpleBloomFilter(s);
+        final BloomFilter<?> bf1 = new SimpleBloomFilter(s);
         bf1.merge((BitMapExtractor) predicate -> {
             int limit = Integer.MAX_VALUE - 1;
             while (limit > 64) {
@@ -257,12 +257,12 @@ public class DefaultBloomFilterTest extends AbstractBloomFilterTest<DefaultBloom
 
     @Test
     public void testSparseNonSparseMerging() {
-        final BloomFilter bf1 = new SparseDefaultBloomFilter(getTestShape());
+        final BloomFilter<?> bf1 = new SparseDefaultBloomFilter(getTestShape());
         bf1.merge(TestingHashers.FROM1);
-        final BloomFilter bf2 = new NonSparseDefaultBloomFilter(getTestShape());
+        final BloomFilter<?> bf2 = new NonSparseDefaultBloomFilter(getTestShape());
         bf2.merge(TestingHashers.FROM11);
 
-        BloomFilter result = bf1.copy();
+        BloomFilter<?> result = bf1.copy();
         result.merge(bf2);
         assertEquals(27, result.cardinality());
 
