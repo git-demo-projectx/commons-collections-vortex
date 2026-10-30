@@ -18,31 +18,29 @@ package org.apache.commons.collections4.bloomfilter;
 
 public class BitMapExtractorFromWrappedBloomFilterTest extends AbstractBitMapExtractorTest {
 
+    private static class Fixture extends WrappedBloomFilter<Fixture> {
+
+        Fixture(final BloomFilter<?> wrapped) {
+            super(wrapped);
+        }
+
+        @Override
+        public Fixture copy() {
+            return new Fixture(getWrapped().copy());
+        }
+    }
+
     protected Shape shape = Shape.fromKM(17, 72);
 
     @Override
     protected BitMapExtractor createEmptyExtractor() {
-        return new WrappedBloomFilter(new DefaultBloomFilterTest.SparseDefaultBloomFilter(shape)) {
-            @Override
-            public BloomFilter copy() {
-                final BloomFilter result = new DefaultBloomFilterTest.SparseDefaultBloomFilter(shape);
-                result.merge(getWrapped());
-                return result;
-            }
-        };
+        return new Fixture(new DefaultBloomFilterTest.SparseDefaultBloomFilter(shape));
     }
 
     @Override
     protected BitMapExtractor createExtractor() {
         final Hasher hasher = new IncrementingHasher(0, 1);
-        final BloomFilter bf = new WrappedBloomFilter(new DefaultBloomFilterTest.SparseDefaultBloomFilter(shape)) {
-            @Override
-            public BloomFilter copy() {
-                final BloomFilter result = new DefaultBloomFilterTest.SparseDefaultBloomFilter(shape);
-                result.merge(getWrapped());
-                return result;
-            }
-        };
+        final Fixture bf = new Fixture(new DefaultBloomFilterTest.SparseDefaultBloomFilter(shape));
         bf.merge(hasher);
         return bf;
     }

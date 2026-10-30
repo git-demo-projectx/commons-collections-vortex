@@ -31,7 +31,7 @@ public class BloomFilterExtractorFromLayeredBloomFilterTest extends AbstractBloo
         final LayerManager<SimpleBloomFilter> layerManager = builder.setExtendCheck(LayerManager.ExtendCheck.advanceOnPopulated())
                 .setCleanup(LayerManager.Cleanup.noCleanup()).get();
         final LayeredBloomFilter underTest = new LayeredBloomFilter(filters[0].getShape(), layerManager);
-        for (final BloomFilter bf : filters) {
+        for (final BloomFilter<?> bf : filters) {
             underTest.merge(bf);
         }
         return underTest;

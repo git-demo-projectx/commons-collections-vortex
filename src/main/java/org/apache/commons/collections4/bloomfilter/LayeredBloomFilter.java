@@ -62,17 +62,17 @@ import java.util.function.Predicate;
  * @param <T> The type of Bloom Filter that is used for the layers.
  * @since 4.5.0
  */
-public class LayeredBloomFilter<T extends BloomFilter> implements BloomFilter, BloomFilterExtractor {
+public class LayeredBloomFilter<T extends BloomFilter<T>> implements BloomFilter<LayeredBloomFilter<T>>, BloomFilterExtractor {
     /**
      * A class used to locate matching filters across all the layers.
      */
-    private class Finder implements Predicate<BloomFilter> {
+    private class Finder implements Predicate<BloomFilter<?>> {
         int[] result = new int[layerManager.getDepth()];
         int bfIdx;
         int resultIdx;
-        BloomFilter bf;
+        BloomFilter<?> bf;
 
-        Finder(final BloomFilter bf) {
+        Finder(final BloomFilter<?> bf) {
             this.bf = bf;
         }
 
@@ -81,7 +81,7 @@ public class LayeredBloomFilter<T extends BloomFilter> implements BloomFilter, B
         }
 
         @Override
-        public boolean test(final BloomFilter x) {
+        public boolean test(final BloomFilter<?> x) {
             if (x.contains(bf)) {
                 result[resultIdx++] = bfIdx;
             }
@@ -147,7 +147,7 @@ public class LayeredBloomFilter<T extends BloomFilter> implements BloomFilter, B
      * @return {@code true} if this filter contains the other filter.
      */
     @Override
-    public boolean contains(final BloomFilter other) {
+    public boolean contains(final BloomFilter<?> other) {
         return other instanceof BloomFilterExtractor ? contains((BloomFilterExtractor) other)
                 : !processBloomFilters(x -> !x.contains(other));
     }
@@ -191,7 +191,7 @@ public class LayeredBloomFilter<T extends BloomFilter> implements BloomFilter, B
      * @param bitMapExtractor the BitMapExtractor to create the filter from.
      * @return the BloomFilter.
      */
-    private BloomFilter createFilter(final BitMapExtractor bitMapExtractor) {
+    private BloomFilter<?> createFilter(final BitMapExtractor bitMapExtractor) {
         final SimpleBloomFilter bf = new SimpleBloomFilter(shape);
         bf.merge(bitMapExtractor);
         return bf;
@@ -203,7 +203,7 @@ public class LayeredBloomFilter<T extends BloomFilter> implements BloomFilter, B
      * @param hasher the hasher to create the filter from.
      * @return the BloomFilter.
      */
-    private BloomFilter createFilter(final Hasher hasher) {
+    private BloomFilter<?> createFilter(final Hasher hasher) {
         final SimpleBloomFilter bf = new SimpleBloomFilter(shape);
         bf.merge(hasher);
         return bf;
@@ -215,7 +215,7 @@ public class LayeredBloomFilter<T extends BloomFilter> implements BloomFilter, B
      * @param indexExtractor the IndexExtractor to create the filter from.
      * @return the BloomFilter.
      */
-    private BloomFilter createFilter(final IndexExtractor indexExtractor) {
+    private BloomFilter<?> createFilter(final IndexExtractor indexExtractor) {
         final SimpleBloomFilter bf = new SimpleBloomFilter(shape);
         bf.merge(indexExtractor);
         return bf;
@@ -227,9 +227,9 @@ public class LayeredBloomFilter<T extends BloomFilter> implements BloomFilter, B
     }
 
     @Override
-    public int estimateUnion(final BloomFilter other) {
+    public int estimateUnion(final BloomFilter<?> other) {
         Objects.requireNonNull(other, "other");
-        final BloomFilter cpy = this.flatten();
+        final BloomFilter<?> cpy = this.flatten();
         cpy.merge(other);
         return cpy.estimateN();
     }
@@ -252,7 +252,7 @@ public class LayeredBloomFilter<T extends BloomFilter> implements BloomFilter, B
      * @param bf the Bloom filter to search for.
      * @return an array of layer indices in which the Bloom filter is found.
      */
-    public int[] find(final BloomFilter bf) {
+    public int[] find(final BloomFilter<?> bf) {
         final Finder finder = new Finder(bf);
         processBloomFilters(finder);
         return finder.getResult();
@@ -289,8 +289,8 @@ public class LayeredBloomFilter<T extends BloomFilter> implements BloomFilter, B
      * @return the merged bloom filter.
      */
     @Override
-    public BloomFilter flatten() {
-        final BloomFilter bf = new SimpleBloomFilter(shape);
+    public SimpleBloomFilter flatten() {
+        final SimpleBloomFilter bf = new SimpleBloomFilter(shape);
         processBloomFilters(bf::merge);
         return bf;
     }
@@ -332,7 +332,7 @@ public class LayeredBloomFilter<T extends BloomFilter> implements BloomFilter, B
     }
 
     @Override
-    public boolean merge(final BloomFilter bf) {
+    public boolean merge(final BloomFilter<?> bf) {
         return layerManager.getTarget().merge(bf);
     }
 
@@ -368,7 +368,7 @@ public class LayeredBloomFilter<T extends BloomFilter> implements BloomFilter, B
      *         otherwise.
      */
     @Override
-    public final boolean processBloomFilters(final Predicate<BloomFilter> bloomFilterPredicate) {
+    public final boolean processBloomFilters(final Predicate<BloomFilter<?>> bloomFilterPredicate) {
         return layerManager.processBloomFilters(bloomFilterPredicate);
     }
 

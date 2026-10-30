@@ -17,7 +17,19 @@
 package org.apache.commons.collections4.bloomfilter;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.net.URI;
+import java.util.Arrays;
+import java.util.Collections;
+
+import javax.tools.DiagnosticCollector;
+import javax.tools.JavaCompiler;
+import javax.tools.JavaFileObject;
+import javax.tools.SimpleJavaFileObject;
+import javax.tools.ToolProvider;
 
 import org.junit.jupiter.api.Test;
 
@@ -29,6 +41,30 @@ public class SimpleBloomFilterTest extends AbstractBloomFilterTest<SimpleBloomFi
     @Override
     protected SimpleBloomFilter createEmptyFilter(final Shape shape) {
         return new SimpleBloomFilter(shape);
+    }
+
+    @Test
+    public void testCopyCannotReturnAnotherFilterType() {
+        final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+        assertNotNull(compiler);
+        final DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
+        final JavaFileObject source = new SimpleJavaFileObject(URI.create("string:///InvalidCopy.java"),
+                JavaFileObject.Kind.SOURCE) {
+            @Override
+            public CharSequence getCharContent(final boolean ignoreEncodingErrors) {
+                return "import org.apache.commons.collections4.bloomfilter.*;"
+                        + "class InvalidCopy { void copy() {"
+                        + "BloomFilter<SimpleBloomFilter> filter = new SimpleBloomFilter(Shape.fromNP(10000, 0.01));"
+                        + "SparseBloomFilter copy = filter.copy();"
+                        + "SparseBloomFilter direct = new SimpleBloomFilter(Shape.fromNP(10000, 0.01)).copy(); }}";
+            }
+        };
+        final Boolean compiled = compiler.getTask(null, null, diagnostics,
+                Arrays.asList("-proc:none", "-classpath", System.getProperty("java.class.path")),
+                null, Collections.singletonList(source)).call();
+        assertFalse(compiled);
+        assertEquals(2, diagnostics.getDiagnostics().stream()
+                .filter(d -> "compiler.err.prob.found.req".equals(d.getCode())).count());
     }
 
     @Test
