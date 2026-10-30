@@ -22,9 +22,10 @@ import java.util.function.LongPredicate;
 /**
  * An abstract class to assist in implementing Bloom filter decorators.
  *
+ * @param <T> the type of decorator returned by {@link #copy()}
  * @since 4.5.0
  */
-public abstract class WrappedBloomFilter implements BloomFilter {
+public abstract class WrappedBloomFilter<T extends WrappedBloomFilter<T>> implements BloomFilter<T> {
     private final BloomFilter wrapped;
 
     /**
