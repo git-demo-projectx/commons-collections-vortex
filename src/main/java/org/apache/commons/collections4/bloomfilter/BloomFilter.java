@@ -23,11 +23,12 @@ import java.util.Objects;
  * <p>
  * <em>See implementation notes for {@link BitMapExtractor} and {@link IndexExtractor}.</em>
  * </p>
+ * @param <T> the type of filter returned by {@link #copy()}.
  * @see BitMapExtractor
  * @see IndexExtractor
  * @since 4.5.0
  */
-public interface BloomFilter extends IndexExtractor, BitMapExtractor {
+public interface BloomFilter<T extends BloomFilter<T>> extends IndexExtractor, BitMapExtractor {
 
     /**
      * The sparse characteristic used to determine the best method for matching.
@@ -84,7 +85,7 @@ public interface BloomFilter extends IndexExtractor, BitMapExtractor {
      * @param other the other Bloom filter
      * @return true if all enabled bits in the other filter are enabled in this filter.
      */
-    default boolean contains(final BloomFilter other) {
+    default boolean contains(final BloomFilter<?> other) {
         Objects.requireNonNull(other, "other");
         return (characteristics() & SPARSE) != 0 ? contains((IndexExtractor) other) : contains((BitMapExtractor) other);
     }
@@ -119,10 +120,9 @@ public interface BloomFilter extends IndexExtractor, BitMapExtractor {
     /**
      * Creates a new instance of the BloomFilter with the same properties as the current one.
      *
-     * @param <T> Type of BloomFilter.
      * @return a copy of this BloomFilter
      */
-    <T extends BloomFilter> T copy();
+    T copy();
 
     // update operations
 
@@ -142,7 +142,7 @@ public interface BloomFilter extends IndexExtractor, BitMapExtractor {
      * @see #estimateN()
      * @see Shape
      */
-    default int estimateIntersection(final BloomFilter other) {
+    default int estimateIntersection(final BloomFilter<?> other) {
         Objects.requireNonNull(other, "other");
         final double eThis = getShape().estimateN(cardinality());
         final double eOther = getShape().estimateN(other.cardinality());
@@ -157,7 +157,7 @@ public interface BloomFilter extends IndexExtractor, BitMapExtractor {
         } else if (Double.isInfinite(eOther)) {
             estimate = Math.round(eThis);
         } else {
-            final BloomFilter union = this.copy();
+            final BloomFilter<?> union = this.copy();
             union.merge(other);
             final double eUnion = getShape().estimateN(union.cardinality());
             if (Double.isInfinite(eUnion)) {
@@ -220,9 +220,9 @@ public interface BloomFilter extends IndexExtractor, BitMapExtractor {
      * @see #estimateN()
      * @see Shape
      */
-    default int estimateUnion(final BloomFilter other) {
+    default int estimateUnion(final BloomFilter<?> other) {
         Objects.requireNonNull(other, "other");
-        final BloomFilter cpy = this.copy();
+        final BloomFilter<?> cpy = this.copy();
         cpy.merge(other);
         return cpy.estimateN();
     }
@@ -290,7 +290,7 @@ public interface BloomFilter extends IndexExtractor, BitMapExtractor {
      * @param other The bloom filter to merge into this one.
      * @return true if the merge was successful
      */
-    default boolean merge(final BloomFilter other) {
+    default boolean merge(final BloomFilter<?> other) {
         return (characteristics() & SPARSE) != 0 ? merge((IndexExtractor) other) : merge((BitMapExtractor) other);
     }
 
