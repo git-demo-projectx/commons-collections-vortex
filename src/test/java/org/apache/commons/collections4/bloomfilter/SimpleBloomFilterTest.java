@@ -17,7 +17,19 @@
 package org.apache.commons.collections4.bloomfilter;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.net.URI;
+import java.util.Arrays;
+import java.util.Collections;
+
+import javax.tools.DiagnosticCollector;
+import javax.tools.JavaCompiler;
+import javax.tools.JavaFileObject;
+import javax.tools.SimpleJavaFileObject;
+import javax.tools.StandardJavaFileManager;
+import javax.tools.ToolProvider;
 
 import org.junit.jupiter.api.Test;
 
@@ -29,6 +41,29 @@ public class SimpleBloomFilterTest extends AbstractBloomFilterTest<SimpleBloomFi
     @Override
     protected SimpleBloomFilter createEmptyFilter(final Shape shape) {
         return new SimpleBloomFilter(shape);
+    }
+
+    @Test
+    public void testCopyRejectsIncompatibleType() throws Exception {
+        final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+        final DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
+        final JavaFileObject source = new SimpleJavaFileObject(URI.create("string:///InvalidCopy.java"),
+                JavaFileObject.Kind.SOURCE) {
+            @Override
+            public CharSequence getCharContent(final boolean ignoreEncodingErrors) {
+                return "import org.apache.commons.collections4.bloomfilter.*;"
+                        + "class InvalidCopy {"
+                        + "SparseBloomFilter filter = new SimpleBloomFilter(Shape.fromNP(10000, 0.01)).copy();"
+                        + "}";
+            }
+        };
+        try (StandardJavaFileManager fileManager = compiler.getStandardFileManager(diagnostics, null, null)) {
+            assertFalse(compiler.getTask(null, fileManager, diagnostics,
+                    Arrays.asList("-proc:none", "-classpath", System.getProperty("java.class.path")),
+                    null, Collections.singletonList(source)).call());
+            assertTrue(diagnostics.getDiagnostics().stream()
+                    .anyMatch(diagnostic -> diagnostic.getCode().equals("compiler.err.prob.found.req")));
+        }
     }
 
     @Test

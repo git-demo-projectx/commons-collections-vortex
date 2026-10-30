@@ -29,7 +29,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Tests for the {@link ArrayCountingBloomFilter}.
  */
-public abstract class AbstractCountingBloomFilterTest<T extends CountingBloomFilter>
+public abstract class AbstractCountingBloomFilterTest<T extends CountingBloomFilter<T>>
         extends AbstractBloomFilterTest<T> {
 
     private static final int[] from1Counts = {0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0};
