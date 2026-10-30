@@ -26,7 +26,7 @@ import java.util.function.LongPredicate;
  * implementation and should work well for most Bloom filters.
  * @since 4.5.0
  */
-public final class SimpleBloomFilter implements BloomFilter {
+public final class SimpleBloomFilter implements BloomFilter<SimpleBloomFilter> {
 
     /**
      * The array of bit map longs that defines this Bloom filter. Will be null if the filter is empty.
@@ -140,7 +140,7 @@ public final class SimpleBloomFilter implements BloomFilter {
     }
 
     @Override
-    public boolean merge(final BloomFilter other) {
+    public boolean merge(final BloomFilter<?> other) {
         Objects.requireNonNull(other, "other");
         if ((other.characteristics() & SPARSE) != 0) {
             merge((IndexExtractor) other);

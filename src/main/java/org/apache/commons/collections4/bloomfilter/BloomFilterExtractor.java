@@ -44,7 +44,7 @@ public interface BloomFilterExtractor {
      * @param filters The filters to be returned by the extractor.
      * @return THe BloomFilterExtractor containing the filters.
      */
-    static BloomFilterExtractor fromBloomFilterArray(final BloomFilter... filters) {
+    static BloomFilterExtractor fromBloomFilterArray(final BloomFilter<?>... filters) {
         Objects.requireNonNull(filters, "filters");
         return new BloomFilterExtractor() {
             /**
@@ -63,14 +63,14 @@ public interface BloomFilterExtractor {
              */
             @Override
             public boolean processBloomFilterPair(final BloomFilterExtractor other,
-                                                  final BiPredicate<BloomFilter, BloomFilter> func) {
-                final CountingPredicate<BloomFilter> p = new CountingPredicate<>(filters, func);
+                                                  final BiPredicate<BloomFilter<?>, BloomFilter<?>> func) {
+                final CountingPredicate<BloomFilter<?>> p = new CountingPredicate<>(filters, func);
                 return other.processBloomFilters(p) && p.processRemaining();
             }
 
             @Override
-            public boolean processBloomFilters(final Predicate<BloomFilter> predicate) {
-                for (final BloomFilter filter : filters) {
+            public boolean processBloomFilters(final Predicate<BloomFilter<?>> predicate) {
+                for (final BloomFilter<?> filter : filters) {
                     if (!predicate.test(filter)) {
                         return false;
                     }
@@ -89,9 +89,9 @@ public interface BloomFilterExtractor {
      * @return An array of Bloom filters.
      */
     default BloomFilter[] asBloomFilterArray() {
-        final List<BloomFilter> filters = new ArrayList<>();
+        final List<BloomFilter<?>> filters = new ArrayList<>();
         processBloomFilters(f -> filters.add(f.copy()));
-        return filters.toArray(new BloomFilter[0]);
+        return filters.toArray(new BloomFilter<?>[0]);
     }
 
     /**
@@ -101,8 +101,8 @@ public interface BloomFilterExtractor {
      * @return the merged bloom filter, never null.
      * @throws NullPointerException if this call did not process any filters.
      */
-    default BloomFilter flatten() {
-        final AtomicReference<BloomFilter> ref = new AtomicReference<>();
+    default SimpleBloomFilter flatten() {
+        final AtomicReference<SimpleBloomFilter> ref = new AtomicReference<>();
         processBloomFilters(x -> {
             if (ref.get() == null) {
                 ref.set(new SimpleBloomFilter(x.getShape()));
@@ -129,8 +129,8 @@ public interface BloomFilterExtractor {
      *         {@code false} otherwise.
      */
     default boolean processBloomFilterPair(final BloomFilterExtractor other,
-                                           final BiPredicate<BloomFilter, BloomFilter> func) {
-        final CountingPredicate<BloomFilter> p = new CountingPredicate<>(asBloomFilterArray(), func);
+                                           final BiPredicate<BloomFilter<?>, BloomFilter<?>> func) {
+        final CountingPredicate<BloomFilter<?>> p = new CountingPredicate<>(asBloomFilterArray(), func);
         return other.processBloomFilters(p) && p.processRemaining();
     }
 
@@ -142,5 +142,5 @@ public interface BloomFilterExtractor {
      * @return {@code false} when the first filter fails the predicate test. Returns
      *         {@code true} if all filters pass the test.
      */
-    boolean processBloomFilters(Predicate<BloomFilter> bloomFilterPredicate);
+    boolean processBloomFilters(Predicate<BloomFilter<?>> bloomFilterPredicate);
 }
