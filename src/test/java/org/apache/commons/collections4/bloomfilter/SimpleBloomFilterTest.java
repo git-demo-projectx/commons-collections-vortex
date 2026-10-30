@@ -31,12 +31,12 @@ public class SimpleBloomFilterTest extends AbstractBloomFilterTest<SimpleBloomFi
     }
 
     @Test
-    public void testMergeShortBitMapProducer() {
+    public void testMergeShortBitMapExtractor() {
         final SimpleBloomFilter filter = createEmptyFilter(getTestShape());
-        // create a producer that returns too few values
+        // create an extractor that returns too few values
         // shape expects 2 longs we are sending 1.
-        final BitMapProducer producer = p -> p.test(2L);
-        assertTrue(filter.merge(producer));
+        final BitMapExtractor extractor = p -> p.test(2L);
+        assertTrue(filter.merge(extractor));
         assertEquals(1, filter.cardinality());
     }
 }
