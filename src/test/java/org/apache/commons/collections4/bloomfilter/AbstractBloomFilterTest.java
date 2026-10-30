@@ -34,7 +34,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Tests standard methods in the {@link BloomFilter} interface.
  */
-public abstract class AbstractBloomFilterTest<T extends BloomFilter> {
+public abstract class AbstractBloomFilterTest<T extends BloomFilter<T>> {
 
     /**
      * Test fixture class returns the value as the only value.
@@ -245,9 +245,9 @@ public abstract class AbstractBloomFilterTest<T extends BloomFilter> {
     }
 
     protected void testCopy(final boolean assertClass) {
-        final BloomFilter bf1 = createFilter(getTestShape(), TestingHashers.FROM1);
+        final T bf1 = createFilter(getTestShape(), TestingHashers.FROM1);
         assertNotEquals(0, bf1.cardinality());
-        final BloomFilter copy = bf1.copy();
+        final T copy = bf1.copy();
         assertNotSame(bf1, copy);
         assertArrayEquals(bf1.asBitMapArray(), copy.asBitMapArray());
         assertArrayEquals(bf1.asIndexArray(), copy.asIndexArray());

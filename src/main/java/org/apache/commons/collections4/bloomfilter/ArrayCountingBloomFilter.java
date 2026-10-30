@@ -49,7 +49,7 @@ import java.util.stream.IntStream;
  * @see CellExtractor
  * @since 4.5.0
  */
-public final class ArrayCountingBloomFilter implements CountingBloomFilter {
+public final class ArrayCountingBloomFilter implements CountingBloomFilter<ArrayCountingBloomFilter> {
 
     /**
      * The shape of this Bloom filter.

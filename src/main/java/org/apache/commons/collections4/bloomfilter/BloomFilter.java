@@ -25,9 +25,10 @@ import java.util.Objects;
  * </p>
  * @see BitMapExtractor
  * @see IndexExtractor
+ * @param <T> the type returned by {@link #copy()}
  * @since 4.5.0
  */
-public interface BloomFilter extends IndexExtractor, BitMapExtractor {
+public interface BloomFilter<T extends BloomFilter<T>> extends IndexExtractor, BitMapExtractor {
 
     /**
      * The sparse characteristic used to determine the best method for matching.
@@ -119,10 +120,9 @@ public interface BloomFilter extends IndexExtractor, BitMapExtractor {
     /**
      * Creates a new instance of the BloomFilter with the same properties as the current one.
      *
-     * @param <T> Type of BloomFilter.
      * @return a copy of this BloomFilter
      */
-    <T extends BloomFilter> T copy();
+    T copy();
 
     // update operations
 
