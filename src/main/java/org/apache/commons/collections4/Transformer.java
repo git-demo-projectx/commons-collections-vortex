@@ -23,7 +23,7 @@ import java.util.function.Function;
  * object into another.
  * <p>
  * A {@code Transformer} converts the input object to the output object.
- * The input object should be left unchanged.
+ * The input object SHOULD be left unchanged.
  * Transformers are typically used for type conversions, or extracting data
  * from an object.
  * </p>
@@ -33,13 +33,14 @@ import java.util.function.Function;
  * cloning and returning the string value.
  * </p>
  *
- * @param <T> the input type to the transformer
- * @param <R> the output type from the transformer
+ * @param <T> the type of the input to the function.
+ * @param <R> the type of the result of the function.
  *
  * @since 1.0
  * @deprecated Use {@link Function}.
  */
 @Deprecated
+@FunctionalInterface
 public interface Transformer<T, R> extends Function<T, R> {
 
     @Override
@@ -48,7 +49,10 @@ public interface Transformer<T, R> extends Function<T, R> {
     }
 
     /**
-     * Transforms the input object (leaving it unchanged) into some output object.
+     * Transforms the input object into some output object.
+     * <p>
+     * The input object SHOULD be left unchanged.
+     * </p>
      *
      * @param input  the object to be transformed, should be left unchanged
      * @return a transformed object

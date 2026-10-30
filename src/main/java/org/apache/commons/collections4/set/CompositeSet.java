@@ -54,6 +54,8 @@ public class CompositeSet<E> implements Set<E>, Serializable {
 
     /**
      * Defines callbacks for mutation operations.
+     *
+     * @param <E> the type of the elements in this instance.
      */
     public interface SetMutator<E> extends Serializable {
 
@@ -192,7 +194,7 @@ public class CompositeSet<E> implements Set<E>, Serializable {
             for (final Set<E> existingSet : getSets()) {
                 final Collection<E> intersects = CollectionUtils.intersection(existingSet, set);
                 if (!intersects.isEmpty()) {
-                    if (this.mutator == null) {
+                    if (mutator == null) {
                         throw new UnsupportedOperationException(
                                 "Collision adding composited set with no SetMutator set");
                     }
@@ -521,7 +523,7 @@ public class CompositeSet<E> implements Set<E>, Serializable {
      * Returns a new Set containing all of the elements.
      *
      * @return A new HashSet containing all of the elements in this composite.
-     *   The new collection is <i>not</i> backed by this composite.
+     *   The new collection is <em>not</em> backed by this composite.
      */
     public Set<E> toSet() {
         return new HashSet<>(this);

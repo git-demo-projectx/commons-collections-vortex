@@ -36,6 +36,9 @@ import org.junit.jupiter.api.Test;
 
 /**
  * Extension of {@link AbstractOrderedMapTest} for exercising the {@link ListOrderedMap} implementation.
+ *
+ * @param <K> the key type.
+ * @param <V> the value type.
  */
 public class ListOrderedMapTest<K, V> extends AbstractOrderedMapTest<K, V> {
 
@@ -47,7 +50,7 @@ public class ListOrderedMapTest<K, V> extends AbstractOrderedMapTest<K, V> {
 
         @Override
         public K[] getFullElements() {
-            return ListOrderedMapTest.this.getSampleKeys();
+            return getSampleKeys();
         }
 
         @Override
@@ -57,7 +60,7 @@ public class ListOrderedMapTest<K, V> extends AbstractOrderedMapTest<K, V> {
 
         @Override
         public boolean isNullSupported() {
-            return ListOrderedMapTest.this.isAllowNullKey();
+            return isAllowNullKey();
         }
 
         @Override
@@ -95,7 +98,7 @@ public class ListOrderedMapTest<K, V> extends AbstractOrderedMapTest<K, V> {
 
         @Override
         public V[] getFullElements() {
-            return ListOrderedMapTest.this.getSampleValues();
+            return getSampleValues();
         }
 
         @Override
@@ -105,7 +108,7 @@ public class ListOrderedMapTest<K, V> extends AbstractOrderedMapTest<K, V> {
 
         @Override
         public boolean isNullSupported() {
-            return ListOrderedMapTest.this.isAllowNullKey();
+            return isAllowNullKey();
         }
 
         @Override

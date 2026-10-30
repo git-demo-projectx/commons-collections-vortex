@@ -515,7 +515,7 @@ public class TreeBidiMap<K extends Comparable<K>, V extends Comparable<V>>
         }
 
         @Override
-        public K setValue(final K obj) {
+        public K setValue(final K value) {
             throw new UnsupportedOperationException();
         }
     }
@@ -860,7 +860,7 @@ public class TreeBidiMap<K extends Comparable<K>, V extends Comparable<V>>
         }
 
         @Override
-        public V setValue(final V obj) {
+        public V setValue(final V value) {
             throw new UnsupportedOperationException();
         }
     }
@@ -1962,7 +1962,7 @@ public class TreeBidiMap<K extends Comparable<K>, V extends Comparable<V>>
     }
 
     /**
-     * Reads the content of the stream.
+     * Deserializes the content of the stream.
      *
      * @param stream the input stream
      * @throws IOException if an error occurs while reading from the stream
@@ -2219,17 +2219,17 @@ public class TreeBidiMap<K extends Comparable<K>, V extends Comparable<V>>
     }
 
     /**
-     * Writes the content to the stream for serialization.
+     * Serializes this object to an ObjectOutputStream.
      *
-     * @param stream  the output stream
-     * @throws IOException if an error occurs while writing to the stream
+     * @param out the target ObjectOutputStream.
+     * @throws IOException thrown when an I/O errors occur writing to the target stream.
      */
-    private void writeObject(final ObjectOutputStream stream) throws IOException {
-        stream.defaultWriteObject();
-        stream.writeInt(this.size());
+    private void writeObject(final ObjectOutputStream out) throws IOException {
+        out.defaultWriteObject();
+        out.writeInt(this.size());
         for (final Entry<K, V> entry : entrySet()) {
-            stream.writeObject(entry.getKey());
-            stream.writeObject(entry.getValue());
+            out.writeObject(entry.getKey());
+            out.writeObject(entry.getValue());
         }
     }
 

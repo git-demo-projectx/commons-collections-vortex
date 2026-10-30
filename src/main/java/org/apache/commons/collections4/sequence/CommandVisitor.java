@@ -105,7 +105,7 @@ package org.apache.commons.collections4.sequence;
  *   }
  *
  *   public String toString() {
- *     StringBuffer buffer = new StringBuffer();
+ *     StringBuilder buffer = new StringBuilder();
  *     for (Iterator iter = v.iterator(); iter.hasNext();) {
  *       buffer.append(' ').append(iter.next());
  *     }
@@ -118,6 +118,7 @@ package org.apache.commons.collections4.sequence;
  * }
  * </pre>
  *
+ * @param <T> the type of the input to the visit operations.
  * @since 4.0
  */
 public interface CommandVisitor<T> {

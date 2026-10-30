@@ -22,7 +22,7 @@ import java.util.function.LongPredicate;
 /**
  * An abstract class to assist in implementing Bloom filter decorators.
  *
- * @since 4.5
+ * @since 4.5.0
  */
 public abstract class WrappedBloomFilter implements BloomFilter {
     private final BloomFilter wrapped;
@@ -30,10 +30,10 @@ public abstract class WrappedBloomFilter implements BloomFilter {
     /**
      * Wraps a Bloom filter.  The wrapped filter is maintained as a reference
      * not a copy.  Changes in one will be reflected in the other.
-     * @param bf The Bloom filter.
+     * @param wrapped The Bloom filter.
      */
-    public WrappedBloomFilter(final BloomFilter bf) {
-        this.wrapped = bf;
+    public WrappedBloomFilter(final BloomFilter wrapped) {
+        this.wrapped = wrapped;
     }
 
     @Override
@@ -62,8 +62,8 @@ public abstract class WrappedBloomFilter implements BloomFilter {
     }
 
     @Override
-    public boolean contains(final BitMapProducer bitMapProducer) {
-        return wrapped.contains(bitMapProducer);
+    public boolean contains(final BitMapExtractor bitMapExtractor) {
+        return wrapped.contains(bitMapExtractor);
     }
 
     @Override
@@ -77,8 +77,8 @@ public abstract class WrappedBloomFilter implements BloomFilter {
     }
 
     @Override
-    public boolean contains(final IndexProducer indexProducer) {
-        return wrapped.contains(indexProducer);
+    public boolean contains(final IndexExtractor indexExtractor) {
+        return wrapped.contains(indexExtractor);
     }
 
     @Override
@@ -97,25 +97,15 @@ public abstract class WrappedBloomFilter implements BloomFilter {
     }
 
     @Override
-    public boolean forEachBitMap(final LongPredicate predicate) {
-        return wrapped.forEachBitMap(predicate);
-    }
-
-    @Override
-    public boolean forEachBitMapPair(final BitMapProducer other, final LongBiPredicate func) {
-        return wrapped.forEachBitMapPair(other, func);
-    }
-
-    @Override
-    public boolean forEachIndex(final IntPredicate predicate) {
-        return wrapped.forEachIndex(predicate);
-    }
-
-    @Override
     public Shape getShape() {
         return wrapped.getShape();
     }
 
+    /**
+     * Gets the wrapped BloomFilter.
+     *
+     * @return the wrapped BloomFilter.
+     */
     protected BloomFilter getWrapped() {
         return wrapped;
     }
@@ -126,8 +116,8 @@ public abstract class WrappedBloomFilter implements BloomFilter {
     }
 
     @Override
-    public boolean merge(final BitMapProducer bitMapProducer) {
-        return wrapped.merge(bitMapProducer);
+    public boolean merge(final BitMapExtractor bitMapExtractor) {
+        return wrapped.merge(bitMapExtractor);
     }
 
     @Override
@@ -141,7 +131,22 @@ public abstract class WrappedBloomFilter implements BloomFilter {
     }
 
     @Override
-    public boolean merge(final IndexProducer indexProducer) {
-        return wrapped.merge(indexProducer);
+    public boolean merge(final IndexExtractor indexExtractor) {
+        return wrapped.merge(indexExtractor);
+    }
+
+    @Override
+    public boolean processBitMapPairs(final BitMapExtractor other, final LongBiPredicate func) {
+        return wrapped.processBitMapPairs(other, func);
+    }
+
+    @Override
+    public boolean processBitMaps(final LongPredicate predicate) {
+        return wrapped.processBitMaps(predicate);
+    }
+
+    @Override
+    public boolean processIndices(final IntPredicate predicate) {
+        return wrapped.processIndices(predicate);
     }
 }

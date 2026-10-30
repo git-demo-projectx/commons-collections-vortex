@@ -39,7 +39,10 @@ import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 
 /**
- * Abstract test class for {@link BidiMap} methods and contracts.
+ * Tests {@link BidiMap}.
+ *
+ * @param <K> the key type.
+ * @param <V> the value type.
  */
 public abstract class AbstractBidiMapTest<K, V> extends AbstractIterableMapTest<K, V> {
 
@@ -116,13 +119,13 @@ public abstract class AbstractBidiMapTest<K, V> extends AbstractIterableMapTest<
 
         @Override
         public V[] addSetValues() {
-            return AbstractBidiMapTest.this.getNewSampleValues();
+            return getNewSampleValues();
         }
 
         @Override
         public Map<K, V> getConfirmedMap() {
             // assumes makeFullMapIterator() called first
-            return AbstractBidiMapTest.this.getConfirmed();
+            return getConfirmed();
         }
 
         @Override
@@ -145,12 +148,12 @@ public abstract class AbstractBidiMapTest<K, V> extends AbstractIterableMapTest<
 
         @Override
         public boolean supportsRemove() {
-            return AbstractBidiMapTest.this.isRemoveSupported();
+            return isRemoveSupported();
         }
 
         @Override
         public boolean supportsSetValue() {
-            return AbstractBidiMapTest.this.isSetValueSupported();
+            return isSetValueSupported();
         }
 
         @Override
@@ -197,6 +200,16 @@ public abstract class AbstractBidiMapTest<K, V> extends AbstractIterableMapTest<
         @Override
         public boolean isAllowNullValue() {
             return main.isAllowNullValue();
+        }
+
+        @Override
+        public boolean isAllowNullValueGet() {
+            return main.isAllowNullValueGet();
+        }
+
+        @Override
+        public boolean isAllowNullValuePut() {
+            return main.isAllowNullValuePut();
         }
 
         @Override

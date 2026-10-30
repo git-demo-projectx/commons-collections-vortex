@@ -29,10 +29,12 @@ import org.apache.commons.collections4.Transformer;
  * is passed to the second transformer and so on.
  * </p>
  *
+ * @param <T> the type of the input and result to the function.
  * @since 3.0
  */
 public class ChainedTransformer<T> implements Transformer<T, T>, Serializable {
 
+    @SuppressWarnings("rawtypes")
     private static final Transformer[] EMPTY_TRANSFORMER_ARRAY = {};
 
     /** Serial version UID */
@@ -108,7 +110,7 @@ public class ChainedTransformer<T> implements Transformer<T, T>, Serializable {
      * @since 3.1
      */
     public Transformer<? super T, ? extends T>[] getTransformers() {
-        return FunctorUtils.<T, T>copy(iTransformers);
+        return FunctorUtils.copy(iTransformers);
     }
 
     /**
@@ -120,7 +122,7 @@ public class ChainedTransformer<T> implements Transformer<T, T>, Serializable {
     @Override
     public T transform(T object) {
         for (final Transformer<? super T, ? extends T> iTransformer : iTransformers) {
-            object = iTransformer.transform(object);
+            object = iTransformer.apply(object);
         }
         return object;
     }

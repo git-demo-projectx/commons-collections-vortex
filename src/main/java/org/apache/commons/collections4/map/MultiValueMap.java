@@ -73,6 +73,8 @@ public class MultiValueMap<K, V> extends AbstractMapDecorator<K, Object> impleme
 
     /**
      * Inner class that provides a simple reflection factory.
+     *
+     * @param <T> the type of results supplied by this supplier.
      */
     private static final class ReflectionFactory<T extends Collection<?>> implements Factory<T>, Serializable {
 
@@ -94,6 +96,13 @@ public class MultiValueMap<K, V> extends AbstractMapDecorator<K, Object> impleme
             }
         }
 
+        /**
+         * Deserializes an instance from an ObjectInputStream.
+         *
+         * @param in The source ObjectInputStream.
+         * @throws IOException            Any of the usual Input/Output related exceptions.
+         * @throws ClassNotFoundException A class of a serialized object cannot be found.
+         */
         private void readObject(final ObjectInputStream is) throws IOException, ClassNotFoundException {
             is.defaultReadObject();
             // ensure that the de-serialized class is a Collection, COLLECTIONS-580
@@ -308,7 +317,7 @@ public class MultiValueMap<K, V> extends AbstractMapDecorator<K, Object> impleme
      * @return the new collection
      */
     protected Collection<V> createCollection(final int size) {
-        return collectionFactory.create();
+        return collectionFactory.get();
     }
 
     /**
@@ -356,7 +365,7 @@ public class MultiValueMap<K, V> extends AbstractMapDecorator<K, Object> impleme
         return new LazyIteratorChain<Entry<K, V>>() {
             @Override
             protected Iterator<? extends Entry<K, V>> nextIterator(final int count) {
-                if ( ! keyIterator.hasNext() ) {
+                if (!keyIterator.hasNext()) {
                     return null;
                 }
                 final K key = keyIterator.next();
@@ -365,10 +374,12 @@ public class MultiValueMap<K, V> extends AbstractMapDecorator<K, Object> impleme
                     public K getKey() {
                         return key;
                     }
+
                     @Override
                     public V getValue() {
                         return input;
                     }
+
                     @Override
                     public V setValue(final V value) {
                         throw new UnsupportedOperationException();
@@ -475,7 +486,7 @@ public class MultiValueMap<K, V> extends AbstractMapDecorator<K, Object> impleme
     }
 
     /**
-     * Read the map in using a custom routine.
+     * Deserializes the map in using a custom routine.
      *
      * @param in  the input stream
      * @throws IOException if an error occurs while reading from the stream
@@ -559,10 +570,10 @@ public class MultiValueMap<K, V> extends AbstractMapDecorator<K, Object> impleme
     }
 
     /**
-     * Write the map out using a custom routine.
+     * Serializes this object to an ObjectOutputStream.
      *
-     * @param out  the output stream
-     * @throws IOException if an error occurs while writing to the stream
+     * @param out the target ObjectOutputStream.
+     * @throws IOException thrown when an I/O errors occur writing to the target stream.
      * @since 4.0
      */
     private void writeObject(final ObjectOutputStream out) throws IOException {

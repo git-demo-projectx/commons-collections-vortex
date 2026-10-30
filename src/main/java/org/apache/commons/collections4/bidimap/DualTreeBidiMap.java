@@ -322,10 +322,20 @@ public class DualTreeBidiMap<K, V> extends AbstractDualBidiMap<K, V>
         return (SortedBidiMap<V, K>) super.inverseBidiMap();
     }
 
+    /**
+     * Defaults to {@link #inverseBidiMap()}.
+     *
+     * @return Defaults to {@link #inverseBidiMap()}.
+     */
     public OrderedBidiMap<V, K> inverseOrderedBidiMap() {
         return inverseBidiMap();
     }
 
+    /**
+     * Defaults to {@link #inverseBidiMap()}.
+     *
+     * @return Defaults to {@link #inverseBidiMap()}.
+     */
     public SortedBidiMap<V, K> inverseSortedBidiMap() {
         return inverseBidiMap();
     }
@@ -340,6 +350,7 @@ public class DualTreeBidiMap<K, V> extends AbstractDualBidiMap<K, V>
      * <p>
      * This implementation copies the elements to an ArrayList in order to
      * provide the forward/backward behavior.
+     * </p>
      *
      * @return a new ordered map iterator
      */
@@ -381,6 +392,13 @@ public class DualTreeBidiMap<K, V> extends AbstractDualBidiMap<K, V>
         return hm.lastKey();
     }
 
+    /**
+     * Deserializes an instance from an ObjectInputStream.
+     *
+     * @param in The source ObjectInputStream.
+     * @throws IOException            Any of the usual Input/Output related exceptions.
+     * @throws ClassNotFoundException A class of a serialized object cannot be found.
+     */
     private void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException {
         in.defaultReadObject();
         normalMap = new TreeMap<>(comparator);
@@ -407,7 +425,12 @@ public class DualTreeBidiMap<K, V> extends AbstractDualBidiMap<K, V>
         return ((SortedMap<V, K>) reverseMap).comparator();
     }
 
-    // Serialization
+    /**
+     * Serializes this object to an ObjectOutputStream.
+     *
+     * @param out the target ObjectOutputStream.
+     * @throws IOException thrown when an I/O errors occur writing to the target stream.
+     */
     private void writeObject(final ObjectOutputStream out) throws IOException {
         out.defaultWriteObject();
         out.writeObject(normalMap);

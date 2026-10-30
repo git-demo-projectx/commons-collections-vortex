@@ -41,6 +41,8 @@ public abstract class AbstractMultiSet<E> extends AbstractCollection<E> implemen
 
     /**
      * Inner class AbstractEntry.
+     *
+     * @param <E> the element type.
      */
     protected abstract static class AbstractEntry<E> implements Entry<E> {
 
@@ -48,7 +50,7 @@ public abstract class AbstractMultiSet<E> extends AbstractCollection<E> implemen
         public boolean equals(final Object object) {
             if (object instanceof Entry) {
                 final Entry<?> other = (Entry<?>) object;
-                final E element = this.getElement();
+                final E element = getElement();
                 final Object otherElement = other.getElement();
 
                 return this.getCount() == other.getCount() &&
@@ -68,8 +70,11 @@ public abstract class AbstractMultiSet<E> extends AbstractCollection<E> implemen
             return String.format("%s:%d", getElement(), getCount());
         }
     }
+
     /**
      * Inner class EntrySet.
+     *
+     * @param <E> the element type.
      */
     protected static class EntrySet<E> extends AbstractSet<Entry<E>> {
 
@@ -180,6 +185,8 @@ public abstract class AbstractMultiSet<E> extends AbstractCollection<E> implemen
 
     /**
      * Inner class UniqueSet.
+     *
+     * @param <E> the element type.
      */
     protected static class UniqueSet<E> extends AbstractSet<E> {
 

@@ -44,7 +44,7 @@ import org.apache.commons.collections4.OrderedIterator;
  * (see COLLECTIONS-842 for details).
  *
  * @param <E> the type of elements in this list
- * @since 3.0
+ * @since 4.5.0-M2
  */
 public abstract class AbstractLinkedListForJava21<E> implements List<E> {
 
@@ -404,6 +404,9 @@ public abstract class AbstractLinkedListForJava21<E> implements List<E> {
      * <p>
      * From Commons Collections 3.1, all access to the {@code value} property
      * is via the methods on this class.
+     * </p>
+     *
+     * @param <E> the type of the node value.
      */
     protected static class Node<E> {
 

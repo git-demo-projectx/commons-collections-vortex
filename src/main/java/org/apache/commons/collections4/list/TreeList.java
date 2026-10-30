@@ -59,6 +59,7 @@ import org.apache.commons.collections4.OrderedIterator;
  * does use slightly more memory.
  * </p>
  *
+ * @param <E> the type of the elements in the list.
  * @since 3.1
  */
 public class TreeList<E> extends AbstractList<E> {
@@ -276,21 +277,21 @@ public class TreeList<E> extends AbstractList<E> {
          */
         private AVLNode<E> balance() {
             switch (heightRightMinusLeft()) {
-            case 1 :
-            case 0 :
-            case -1 :
+            case 1:
+            case 0:
+            case -1:
                 return this;
-            case -2 :
+            case -2:
                 if (left.heightRightMinusLeft() > 0) {
                     setLeft(left.rotateLeft(), null);
                 }
                 return rotateRight();
-            case 2 :
+            case 2:
                 if (right.heightRightMinusLeft() < 0) {
                     setRight(right.rotateRight(), null);
                 }
                 return rotateLeft();
-            default :
+            default:
                 throw new IllegalStateException("tree inconsistent!");
             }
         }

@@ -25,10 +25,10 @@ import java.util.List;
 /**
  * Serializable subclass of AbstractListDecorator.
  *
+ * @param <E> the type of the elements in the list.
  * @since 3.1
  */
-public abstract class AbstractSerializableListDecorator<E>
-        extends AbstractListDecorator<E> {
+public abstract class AbstractSerializableListDecorator<E> extends AbstractListDecorator<E> {
 
     /** Serialization version */
     private static final long serialVersionUID = 2684959196747496299L;
@@ -44,7 +44,7 @@ public abstract class AbstractSerializableListDecorator<E>
     }
 
     /**
-     * Read the list in using a custom routine.
+     * Deserializes the list in using a custom routine.
      *
      * @param in  the input stream
      * @throws IOException if an error occurs while reading from the stream
@@ -57,10 +57,10 @@ public abstract class AbstractSerializableListDecorator<E>
     }
 
     /**
-     * Write the list out using a custom routine.
+     * Serializes this object to an ObjectOutputStream.
      *
-     * @param out  the output stream
-     * @throws IOException if an error occurs while writing to the stream
+     * @param out the target ObjectOutputStream.
+     * @throws IOException thrown when an I/O errors occur writing to the target stream.
      */
     private void writeObject(final ObjectOutputStream out) throws IOException {
         out.defaultWriteObject();

@@ -464,7 +464,7 @@ public class IteratorUtilsTest {
 
         final List<Integer> combinedList = new ArrayList<>(collectionOdd);
         combinedList.addAll(collectionEven);
-        combinedList.sort(null);
+        Collections.sort(combinedList);
 
         assertEquals(combinedList, result);
 
@@ -750,12 +750,21 @@ public class IteratorUtilsTest {
         assertEquals(1, (int) IteratorUtils.get(iterator, 0));
         iterator = iterableA.iterator();
         assertEquals(2, (int) IteratorUtils.get(iterator, 1));
-
         // Iterator, non-existent entry
         final Iterator<Integer> finalIterator = iterator;
-        assertThrows(IndexOutOfBoundsException.class, () -> IteratorUtils.get(finalIterator, 10),
-                "Expecting IndexOutOfBoundsException.");
+        assertThrows(IndexOutOfBoundsException.class, () -> IteratorUtils.get(finalIterator, 10), "Expecting IndexOutOfBoundsException.");
+        assertFalse(iterator.hasNext());
+    }
 
+    @Test
+    public void testGetAtIndexFromIteratorDefault() throws Exception {
+        // Iterator, entry exists
+        Iterator<Integer> iterator = iterableA.iterator();
+        assertEquals(1, (int) IteratorUtils.get(iterator, 0, i -> 0));
+        iterator = iterableA.iterator();
+        assertEquals(2, (int) IteratorUtils.get(iterator, 1, i -> 0));
+        // Iterator, non-existent entry
+        assertEquals(111, (int) IteratorUtils.get(iterator, 10, i -> 111));
         assertFalse(iterator.hasNext());
     }
 

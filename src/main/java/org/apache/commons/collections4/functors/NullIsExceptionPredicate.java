@@ -25,15 +25,16 @@ import org.apache.commons.collections4.Predicate;
 /**
  * Predicate implementation that throws an exception if the input is null.
  *
+ * @param <T> the type of the input to the predicate.
  * @since 3.0
  */
-public final class NullIsExceptionPredicate<T> implements PredicateDecorator<T>, Serializable {
+public final class NullIsExceptionPredicate<T> extends AbstractPredicate<T> implements PredicateDecorator<T>, Serializable {
 
     /** Serial version UID */
     private static final long serialVersionUID = 3243449850504576071L;
 
     /**
-     * Factory to create the null exception predicate.
+     * Creates the null exception predicate.
      *
      * @param <T> the type that the predicate queries
      * @param predicate  the predicate to decorate, not null
@@ -58,22 +59,6 @@ public final class NullIsExceptionPredicate<T> implements PredicateDecorator<T>,
     }
 
     /**
-     * Evaluates the predicate returning the result of the decorated predicate
-     * once a null check is performed.
-     *
-     * @param object  the input object
-     * @return true if decorated predicate returns true
-     * @throws FunctorException if input is null
-     */
-    @Override
-    public boolean evaluate(final T object) {
-        if (object == null) {
-            throw new FunctorException("Input Object must not be null");
-        }
-        return iPredicate.evaluate(object);
-    }
-
-    /**
      * Gets the predicate being decorated.
      *
      * @return the predicate as the only element in an array
@@ -83,6 +68,22 @@ public final class NullIsExceptionPredicate<T> implements PredicateDecorator<T>,
     @SuppressWarnings("unchecked")
     public Predicate<? super T>[] getPredicates() {
         return new Predicate[] { iPredicate };
+    }
+
+    /**
+     * Evaluates the predicate returning the result of the decorated predicate
+     * once a null check is performed.
+     *
+     * @param object  the input object
+     * @return true if decorated predicate returns true
+     * @throws FunctorException if input is null
+     */
+    @Override
+    public boolean test(final T object) {
+        if (object == null) {
+            throw new FunctorException("Input Object must not be null");
+        }
+        return iPredicate.test(object);
     }
 
 }

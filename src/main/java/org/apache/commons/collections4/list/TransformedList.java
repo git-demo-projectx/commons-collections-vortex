@@ -36,6 +36,7 @@ import org.apache.commons.collections4.iterators.AbstractListIteratorDecorator;
  * This class is Serializable from Commons Collections 3.1.
  * </p>
  *
+ * @param <E> the type of the elements in the list.
  * @since 3.0
  */
 public class TransformedList<E> extends TransformedCollection<E> implements List<E> {
@@ -61,9 +62,8 @@ public class TransformedList<E> extends TransformedCollection<E> implements List
         }
 
         @Override
-        public void set(E object) {
-            object = transform(object);
-            getListIterator().set(object);
+        public void set(final E object) {
+            getListIterator().set(transform(object));
         }
     }
 
@@ -93,7 +93,7 @@ public class TransformedList<E> extends TransformedCollection<E> implements List
             final E[] values = (E[]) list.toArray(); // NOPMD - false positive for generics
             list.clear();
             for (final E value : values) {
-                decorated.decorated().add(transformer.transform(value));
+                decorated.decorated().add(transformer.apply(value));
             }
         }
         return decorated;

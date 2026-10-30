@@ -25,15 +25,16 @@ import org.apache.commons.collections4.Predicate;
  * Predicate implementation that returns true if the input is the same object
  * as the one stored in this predicate by equals.
  *
+ * @param <T> the type of the input to the predicate.
  * @since 3.0
  */
-public final class EqualPredicate<T> implements Predicate<T>, Serializable {
+public final class EqualPredicate<T> extends AbstractPredicate<T> implements Serializable {
 
     /** Serial version UID */
     private static final long serialVersionUID = 5633766978029907089L;
 
     /**
-     * Factory to create the predicate.
+     * Creates the predicate.
      *
      * @param <T> the type that the predicate queries
      * @param object  the object to compare to
@@ -47,7 +48,7 @@ public final class EqualPredicate<T> implements Predicate<T>, Serializable {
     }
 
     /**
-     * Factory to create the identity predicate.
+     * Creates the identity predicate.
      *
      * @param <T> the type that the predicate queries
      * @param object  the object to compare to
@@ -94,20 +95,6 @@ public final class EqualPredicate<T> implements Predicate<T>, Serializable {
     }
 
     /**
-     * Evaluates the predicate returning true if the input equals the stored value.
-     *
-     * @param object  the input object
-     * @return true if input object equals stored value
-     */
-    @Override
-    public boolean evaluate(final T object) {
-        if (equator != null) {
-            return equator.equate(iValue, object);
-        }
-        return iValue.equals(object);
-    }
-
-    /**
      * Gets the value.
      *
      * @return the value
@@ -115,6 +102,20 @@ public final class EqualPredicate<T> implements Predicate<T>, Serializable {
      */
     public Object getValue() {
         return iValue;
+    }
+
+    /**
+     * Evaluates the predicate returning true if the input equals the stored value.
+     *
+     * @param object  the input object
+     * @return true if input object equals stored value
+     */
+    @Override
+    public boolean test(final T object) {
+        if (equator != null) {
+            return equator.equate(iValue, object);
+        }
+        return iValue.equals(object);
     }
 
 }

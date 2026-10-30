@@ -33,6 +33,7 @@ import org.apache.commons.collections4.Predicate;
  * threw an exception.
  * </p>
  *
+ * @param <T> the type of the input to the predicate.
  * @since 3.0
  */
 public final class AllPredicate<T> extends AbstractQuantifierPredicate<T> {
@@ -41,10 +42,11 @@ public final class AllPredicate<T> extends AbstractQuantifierPredicate<T> {
     private static final long serialVersionUID = -3094696765038308799L;
 
     /**
-     * Factory to create the predicate.
+     * Creates the predicate.
      * <p>
      * If the collection is size zero, the predicate always returns true.
      * If the collection is size one, then that predicate is returned.
+     * </p>
      *
      * @param <T> the type that the predicate queries
      * @param predicates  the predicates to check, cloned, not null
@@ -64,10 +66,11 @@ public final class AllPredicate<T> extends AbstractQuantifierPredicate<T> {
     }
 
     /**
-     * Factory to create the predicate.
+     * Creates the predicate.
      * <p>
      * If the array is size zero, the predicate always returns true.
      * If the array is size one, then that predicate is returned.
+     * </p>
      *
      * @param <T> the type that the predicate queries
      * @param predicates  the predicates to check, cloned, not null
@@ -83,8 +86,8 @@ public final class AllPredicate<T> extends AbstractQuantifierPredicate<T> {
         if (predicates.length == 1) {
             return coerce(predicates[0]);
         }
-
-        return new AllPredicate<>(FunctorUtils.copy(predicates));
+        // <T> not needed in Eclipse but needed by the command line compiler
+        return new AllPredicate<T>(FunctorUtils.copy(predicates));
     }
 
     /**
@@ -104,9 +107,9 @@ public final class AllPredicate<T> extends AbstractQuantifierPredicate<T> {
      * @return true if all decorated predicates return true
      */
     @Override
-    public boolean evaluate(final T object) {
+    public boolean test(final T object) {
         for (final Predicate<? super T> iPredicate : iPredicates) {
-            if (!iPredicate.evaluate(object)) {
+            if (!iPredicate.test(object)) {
                 return false;
             }
         }
