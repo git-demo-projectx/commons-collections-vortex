@@ -26,7 +26,7 @@ import java.util.function.LongPredicate;
  * implementation and should work well for most low cardinality Bloom filters.
  * @since 4.5.0
  */
-public final class SparseBloomFilter implements BloomFilter {
+public final class SparseBloomFilter implements BloomFilter<SparseBloomFilter> {
 
     /**
      * The bitSet that defines this BloomFilter.

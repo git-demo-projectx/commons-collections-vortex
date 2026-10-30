@@ -30,7 +30,7 @@ import org.junit.jupiter.api.Test;
  * Tests for the {@link BloomFilter}.
  */
 public class DefaultBloomFilterTest extends AbstractBloomFilterTest<DefaultBloomFilterTest.AbstractDefaultBloomFilter> {
-    abstract static class AbstractDefaultBloomFilter implements BloomFilter {
+    abstract static class AbstractDefaultBloomFilter implements BloomFilter<AbstractDefaultBloomFilter> {
         private final Shape shape;
         protected TreeSet<Integer> indices;
 
@@ -136,8 +136,8 @@ public class DefaultBloomFilterTest extends AbstractBloomFilterTest<DefaultBloom
         }
 
         @Override
-        public AbstractDefaultBloomFilter copy() {
-            final AbstractDefaultBloomFilter result = new NonSparseDefaultBloomFilter(getShape());
+        public NonSparseDefaultBloomFilter copy() {
+            final NonSparseDefaultBloomFilter result = new NonSparseDefaultBloomFilter(getShape());
             result.indices.addAll(indices);
             return result;
         }
@@ -158,8 +158,8 @@ public class DefaultBloomFilterTest extends AbstractBloomFilterTest<DefaultBloom
         }
 
         @Override
-        public AbstractDefaultBloomFilter copy() {
-            final AbstractDefaultBloomFilter result = new SparseDefaultBloomFilter(getShape());
+        public SparseDefaultBloomFilter copy() {
+            final SparseDefaultBloomFilter result = new SparseDefaultBloomFilter(getShape());
             result.indices.addAll(indices);
             return result;
         }
