@@ -222,7 +222,6 @@
             <exclude>.github/**</exclude>
             <exclude>AGENTS.md</exclude>
             <exclude>Makefile</exclude>
-            <exclude>sonar-project.properties</exclude>
             <exclude>site-content/**/*</exclude>
             <exclude>src/test/resources/org/apache/commons/collections4/data/test/*</exclude>
           </excludes>
@@ -333,7 +332,6 @@
             <exclude>.github/**</exclude>
             <exclude>AGENTS.md</exclude>
             <exclude>Makefile</exclude>
-            <exclude>sonar-project.properties</exclude>
             <exclude>site-content/**/*</exclude>
             <exclude>src/test/resources/org/apache/commons/collections4/data/test/*</exclude>
           </excludes>
