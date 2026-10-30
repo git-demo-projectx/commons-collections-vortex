@@ -28,7 +28,7 @@ public class IndexExtractorFromSparseBloomFilterTest extends AbstractIndexExtrac
     @Override
     protected IndexExtractor createExtractor() {
         final Hasher hasher = new IncrementingHasher(4, 7);
-        final BloomFilter bf = new SparseBloomFilter(shape);
+        final BloomFilter<?> bf = new SparseBloomFilter(shape);
         bf.merge(hasher);
         return bf;
     }

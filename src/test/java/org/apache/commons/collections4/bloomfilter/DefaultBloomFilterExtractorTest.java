@@ -21,7 +21,7 @@ public class DefaultBloomFilterExtractorTest extends AbstractBloomFilterExtracto
     @Override
     protected BloomFilterExtractor createUnderTest(final BloomFilter... filters) {
         return bloomFilterPredicate -> {
-            for (final BloomFilter bf : filters) {
+            for (final BloomFilter<?> bf : filters) {
                 if (!bloomFilterPredicate.test(bf)) {
                     return false;
                 }
