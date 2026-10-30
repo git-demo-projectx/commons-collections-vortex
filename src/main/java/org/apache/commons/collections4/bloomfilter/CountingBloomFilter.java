@@ -51,10 +51,11 @@ import java.util.Objects;
  * of the filter after such an operation. For example are the cells not updated,
  * partially updated or updated entirely before the exception is raised.</p>
  *
+ * @param <T> the type of counting filter returned by {@link #copy()}.
  * @see CellExtractor
  * @since 4.5.0
  */
-public interface CountingBloomFilter extends BloomFilter, CellExtractor {
+public interface CountingBloomFilter<T extends CountingBloomFilter<T>> extends BloomFilter<T>, CellExtractor {
 
     // Query Operations
 
@@ -79,7 +80,7 @@ public interface CountingBloomFilter extends BloomFilter, CellExtractor {
      * @return a copy of this CountingBloomFilter
      */
     @Override
-    CountingBloomFilter copy();
+    T copy();
 
     /**
      * Returns the maximum allowable value for a cell count in this Counting filter.
