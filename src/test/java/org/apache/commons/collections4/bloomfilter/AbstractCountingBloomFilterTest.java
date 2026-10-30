@@ -29,7 +29,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Tests for the {@link ArrayCountingBloomFilter}.
  */
-public abstract class AbstractCountingBloomFilterTest<T extends CountingBloomFilter>
+public abstract class AbstractCountingBloomFilterTest<T extends CountingBloomFilter<T>>
         extends AbstractBloomFilterTest<T> {
 
     private static final int[] from1Counts = {0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0};
@@ -46,7 +46,7 @@ public abstract class AbstractCountingBloomFilterTest<T extends CountingBloomFil
      * @param bf the bloom filter
      * @param expected the expected counts
      */
-    private static void assertCounts(final CountingBloomFilter bf, final int[] expected) {
+    private static void assertCounts(final CountingBloomFilter<?> bf, final int[] expected) {
         final Map<Integer, Integer> m = new HashMap<>();
         bf.processCells((i, c) -> {
             m.put(i, c);
@@ -64,7 +64,7 @@ public abstract class AbstractCountingBloomFilterTest<T extends CountingBloomFil
         assertEquals(expected.length - zeros, bf.cardinality());
     }
 
-    private void assertCell3(final CountingBloomFilter bf, final int value) {
+    private void assertCell3(final CountingBloomFilter<?> bf, final int value) {
         bf.processCells((k, v) -> {
             if (k == 3) {
                 assertEquals(value, v, "Mismatch at position 3");
@@ -88,9 +88,9 @@ public abstract class AbstractCountingBloomFilterTest<T extends CountingBloomFil
 
     @Test
     public void mergeIncrementsAllCellsTest() {
-        final CountingBloomFilter f1 = createEmptyFilter(Shape.fromKM(1, 10));
-        final CountingBloomFilter f2 = f1.copy();
-        final CountingBloomFilter f3 = f1.copy();
+        final CountingBloomFilter<?> f1 = createEmptyFilter(Shape.fromKM(1, 10));
+        final CountingBloomFilter<?> f2 = f1.copy();
+        final CountingBloomFilter<?> f3 = f1.copy();
         // index extractor produces 3 two times.
         final IndexExtractor ip = p -> {
             p.test(3);
@@ -108,14 +108,14 @@ public abstract class AbstractCountingBloomFilterTest<T extends CountingBloomFil
 
     @Test
     public void removeDecrementsAllCellsTest() {
-        final CountingBloomFilter f1 = createEmptyFilter(Shape.fromKM(1, 10));
+        final CountingBloomFilter<?> f1 = createEmptyFilter(Shape.fromKM(1, 10));
         final CellExtractor cp = p -> {
             p.test(3, 3);
             return true;
         };
         f1.add(cp);
-        final CountingBloomFilter f2 = f1.copy();
-        final CountingBloomFilter f3 = f1.copy();
+        final CountingBloomFilter<?> f2 = f1.copy();
+        final CountingBloomFilter<?> f3 = f1.copy();
         // index extractor produces 3 two times.
         final IndexExtractor ip = p -> {
             p.test(3);
@@ -141,7 +141,7 @@ public abstract class AbstractCountingBloomFilterTest<T extends CountingBloomFil
      */
     @Test
     public void testAdd() {
-        final CountingBloomFilter bf1 = createFilter(getTestShape(), TestingHashers.FROM1);
+        final CountingBloomFilter<?> bf1 = createFilter(getTestShape(), TestingHashers.FROM1);
         assertTrue(bf1.add(createFilter(getTestShape(), TestingHashers.FROM11)), "Add should work");
         assertTrue(bf1.contains(TestingHashers.FROM1), "Should contain");
         assertTrue(bf1.contains(TestingHashers.FROM11), "Should contain");
@@ -149,7 +149,7 @@ public abstract class AbstractCountingBloomFilterTest<T extends CountingBloomFil
 
         // test overflow
 
-        final CountingBloomFilter bf2 = createEmptyFilter(getTestShape());
+        final CountingBloomFilter<?> bf2 = createEmptyFilter(getTestShape());
         assertTrue(bf2.add(getMaximumValueExtractor(bf2.getMaxCell())), "Should add to empty");
         assertTrue(bf2.isValid(), "Should be valid");
 
@@ -159,9 +159,9 @@ public abstract class AbstractCountingBloomFilterTest<T extends CountingBloomFil
 
     @Test
     public final void testCountingBloomFilterSpecificContains() {
-        final BloomFilter bf = new SimpleBloomFilter(getTestShape());
+        final BloomFilter<?> bf = new SimpleBloomFilter(getTestShape());
         bf.merge(TestingHashers.FROM1);
-        final CountingBloomFilter bf2 = TestingHashers.populateFromHashersFrom1AndFrom11(createEmptyFilter(getTestShape()));
+        final CountingBloomFilter<?> bf2 = TestingHashers.populateFromHashersFrom1AndFrom11(createEmptyFilter(getTestShape()));
 
         assertTrue(bf.contains(bf), "BF Should contain itself");
         assertTrue(bf2.contains(bf2), "BF2 Should contain itself");
@@ -179,7 +179,7 @@ public abstract class AbstractCountingBloomFilterTest<T extends CountingBloomFil
     public final void testCountingSpecificConstructor() {
         // verify hasher duplicates are counted.
         // bit hasher has duplicates for 11, 12,13,14,15,16, and 17
-        final CountingBloomFilter bf = createFilter(getTestShape(), TestingHashers.FROM1);
+        final CountingBloomFilter<?> bf = createFilter(getTestShape(), TestingHashers.FROM1);
         bf.add(CellExtractor.from(TestingHashers.FROM11.indices(getTestShape())));
 
         final long[] lb = bf.asBitMapArray();
@@ -194,17 +194,17 @@ public abstract class AbstractCountingBloomFilterTest<T extends CountingBloomFil
      */
     @Test
     public final void testCountingSpecificMerge() {
-        final BloomFilter bf1 = createFilter(getTestShape(), TestingHashers.FROM1);
+        final BloomFilter<?> bf1 = createFilter(getTestShape(), TestingHashers.FROM1);
 
-        final BloomFilter bf2 = new SimpleBloomFilter(getTestShape());
+        final BloomFilter<?> bf2 = new SimpleBloomFilter(getTestShape());
         bf2.merge(TestingHashers.FROM11);
 
-        final BloomFilter bf3 = bf1.copy();
+        final BloomFilter<?> bf3 = bf1.copy();
         bf3.merge(bf2);
         assertTrue(bf3.contains(bf1), "Should contain");
         assertTrue(bf3.contains(bf2), "Should contain");
 
-        final BloomFilter bf4 = bf2.copy();
+        final BloomFilter<?> bf4 = bf2.copy();
         bf4.merge(bf1);
         assertTrue(bf4.contains(bf1), "Should contain");
         assertTrue(bf4.contains(bf2), "Should contain");
@@ -213,12 +213,12 @@ public abstract class AbstractCountingBloomFilterTest<T extends CountingBloomFil
 
         // test overflow
 
-        final CountingBloomFilter bf5 = createEmptyFilter(getTestShape());
+        final CountingBloomFilter<?> bf5 = createEmptyFilter(getTestShape());
         assertTrue(bf5.add(getMaximumValueExtractor(bf5.getMaxCell())), "Should add to empty");
         assertTrue(bf5.isValid(), "Should be valid");
 
-        final CountingBloomFilter bf6 = bf5.copy();
-        final BloomFilter bf7 = new SimpleBloomFilter(getTestShape());
+        final CountingBloomFilter<?> bf6 = bf5.copy();
+        final BloomFilter<?> bf7 = new SimpleBloomFilter(getTestShape());
         bf7.merge(TestingHashers.FROM1);
         bf6.merge(bf7);
         assertFalse(bf6.isValid(), "Should not be valid");
@@ -232,7 +232,7 @@ public abstract class AbstractCountingBloomFilterTest<T extends CountingBloomFil
         final Shape shape = Shape.fromKM(12, 72);
         final Hasher hasher = new IncrementingHasher(5, 12);
 
-        CountingBloomFilter bf1 = createFilter(shape, hasher);
+        CountingBloomFilter<?> bf1 = createFilter(shape, hasher);
         assertEquals(6, bf1.cardinality());
         bf1.processCells((x, y) -> {
             assertEquals(1, y, "Hasher in constructor results in value not equal to 1");
@@ -256,7 +256,7 @@ public abstract class AbstractCountingBloomFilterTest<T extends CountingBloomFil
 
     @Test
     public void testGetMaxInsert() {
-        final CountingBloomFilter bf = createEmptyFilter(getTestShape());
+        final CountingBloomFilter<?> bf = createEmptyFilter(getTestShape());
         verifyMaxInsert(bf, 0, 0);
         bf.merge(TestingHashers.FROM1);
         verifyMaxInsert(bf, 1, 0);
@@ -280,10 +280,10 @@ public abstract class AbstractCountingBloomFilterTest<T extends CountingBloomFil
      */
     @Test
     public final void testRemove() {
-        final BloomFilter simple = new SimpleBloomFilter(getTestShape());
+        final BloomFilter<?> simple = new SimpleBloomFilter(getTestShape());
         simple.merge(TestingHashers.FROM11);
 
-        final CountingBloomFilter bf1 = createFilter(getTestShape(), TestingHashers.FROM1);
+        final CountingBloomFilter<?> bf1 = createFilter(getTestShape(), TestingHashers.FROM1);
         bf1.add(CellExtractor.from(TestingHashers.FROM11.indices(getTestShape())));
 
         assertTrue(bf1.remove(simple), "Remove should work");
@@ -293,7 +293,7 @@ public abstract class AbstractCountingBloomFilterTest<T extends CountingBloomFil
         assertCounts(bf1, from1Counts);
 
         // with hasher
-        final CountingBloomFilter bf2 = createFilter(getTestShape(), TestingHashers.FROM1);
+        final CountingBloomFilter<?> bf2 = createFilter(getTestShape(), TestingHashers.FROM1);
         bf2.add(CellExtractor.from(TestingHashers.FROM11.indices(getTestShape())));
 
         assertTrue(bf2.remove(TestingHashers.FROM11), "Remove should work");
@@ -303,7 +303,7 @@ public abstract class AbstractCountingBloomFilterTest<T extends CountingBloomFil
         assertCounts(bf2, from1Counts);
 
         // test underflow
-        final CountingBloomFilter bf3 = createFilter(getTestShape(), TestingHashers.FROM1);
+        final CountingBloomFilter<?> bf3 = createFilter(getTestShape(), TestingHashers.FROM1);
         assertFalse(bf3.remove(simple), "Subtract should not work");
         assertFalse(bf3.isValid(), "isValid should return false");
         assertFalse(bf3.contains(TestingHashers.FROM1), "Should not contain");
@@ -314,7 +314,7 @@ public abstract class AbstractCountingBloomFilterTest<T extends CountingBloomFil
         // with IndexExtractor
         final IndexExtractor ip = TestingHashers.FROM11.indices(getTestShape());
 
-        final CountingBloomFilter bf4 = createFilter(getTestShape(), TestingHashers.FROM1);
+        final CountingBloomFilter<?> bf4 = createFilter(getTestShape(), TestingHashers.FROM1);
         bf4.add(CellExtractor.from(TestingHashers.FROM11.indices(getTestShape())));
 
         assertTrue(bf4.remove(ip), "Remove should work");
@@ -325,7 +325,7 @@ public abstract class AbstractCountingBloomFilterTest<T extends CountingBloomFil
 
         // with BitMapExtractor
         final BitMapExtractor bmp = BitMapExtractor.fromIndexExtractor(ip, getTestShape().getNumberOfBits());
-        final CountingBloomFilter bf5 = createFilter(getTestShape(), TestingHashers.FROM1);
+        final CountingBloomFilter<?> bf5 = createFilter(getTestShape(), TestingHashers.FROM1);
         bf5.add(CellExtractor.from(TestingHashers.FROM11.indices(getTestShape())));
 
         assertTrue(bf5.remove(bmp), "Remove should work");
@@ -336,10 +336,10 @@ public abstract class AbstractCountingBloomFilterTest<T extends CountingBloomFil
 
         // test extractor errors
         final IndexExtractor ip2 = IndexExtractor.fromIndexArray(1, 2, getTestShape().getNumberOfBits());
-        final CountingBloomFilter bf6 = createFilter(getTestShape(), TestingHashers.FROM1);
+        final CountingBloomFilter<?> bf6 = createFilter(getTestShape(), TestingHashers.FROM1);
         assertThrows(IllegalArgumentException.class, () -> bf6.remove(ip2));
 
-        final CountingBloomFilter bf7 = createFilter(getTestShape(), TestingHashers.FROM1);
+        final CountingBloomFilter<?> bf7 = createFilter(getTestShape(), TestingHashers.FROM1);
         final BitMapExtractor bmp2 = BitMapExtractor.fromIndexExtractor(ip2, getTestShape().getNumberOfBits());
         assertThrows(IllegalArgumentException.class, () -> bf7.remove(bmp2));
         assertThrows(IllegalArgumentException.class, () -> bf7.remove(new BadHasher(-1)));
@@ -352,10 +352,10 @@ public abstract class AbstractCountingBloomFilterTest<T extends CountingBloomFil
      */
     @Test
     public final void testSubtract() {
-        final CountingBloomFilter bf1 = createFilter(getTestShape(), TestingHashers.FROM1);
+        final CountingBloomFilter<?> bf1 = createFilter(getTestShape(), TestingHashers.FROM1);
         bf1.add(CellExtractor.from(TestingHashers.FROM11.indices(getTestShape())));
 
-        final CountingBloomFilter bf2 = createFilter(getTestShape(), TestingHashers.FROM11);
+        final CountingBloomFilter<?> bf2 = createFilter(getTestShape(), TestingHashers.FROM11);
 
         assertTrue(bf1.subtract(bf2), "Subtract should work");
         assertFalse(bf1.contains(TestingHashers.populateFromHashersFrom1AndFrom11(new SimpleBloomFilter(getTestShape()))), "Should not contain bitHasher");
@@ -364,9 +364,9 @@ public abstract class AbstractCountingBloomFilterTest<T extends CountingBloomFil
         assertCounts(bf1, from1Counts);
 
         // test underflow
-        final CountingBloomFilter bf3 = createFilter(getTestShape(), TestingHashers.FROM1);
+        final CountingBloomFilter<?> bf3 = createFilter(getTestShape(), TestingHashers.FROM1);
 
-        final CountingBloomFilter bf4 = createFilter(getTestShape(), TestingHashers.FROM11);
+        final CountingBloomFilter<?> bf4 = createFilter(getTestShape(), TestingHashers.FROM11);
 
         assertFalse(bf3.subtract(bf4), "Subtract should not work");
         assertFalse(bf3.isValid(), "isValid should return false");
@@ -379,12 +379,12 @@ public abstract class AbstractCountingBloomFilterTest<T extends CountingBloomFil
         assertThrows(IllegalArgumentException.class, () -> bf3.remove(new BadHasher(getTestShape().getNumberOfBits())));
     }
 
-    private void verifyMaxInsert(final CountingBloomFilter bf, final int from1, final int from11) {
-        final BloomFilter bfFrom0 = new DefaultBloomFilterTest.SparseDefaultBloomFilter(getTestShape());
+    private void verifyMaxInsert(final CountingBloomFilter<?> bf, final int from1, final int from11) {
+        final BloomFilter<?> bfFrom0 = new DefaultBloomFilterTest.SparseDefaultBloomFilter(getTestShape());
         bfFrom0.merge(new IncrementingHasher(0, 1));
-        final BloomFilter bfFrom1 = new DefaultBloomFilterTest.SparseDefaultBloomFilter(getTestShape());
+        final BloomFilter<?> bfFrom1 = new DefaultBloomFilterTest.SparseDefaultBloomFilter(getTestShape());
         bfFrom1.merge(TestingHashers.FROM1);
-        final BloomFilter bfFrom11 = new DefaultBloomFilterTest.SparseDefaultBloomFilter(getTestShape());
+        final BloomFilter<?> bfFrom11 = new DefaultBloomFilterTest.SparseDefaultBloomFilter(getTestShape());
         bfFrom11.merge(TestingHashers.FROM11);
 
         assertEquals(0, bf.getMaxInsert(new IncrementingHasher(0, 1)));
