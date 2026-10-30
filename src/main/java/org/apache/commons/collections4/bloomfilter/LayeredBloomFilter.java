@@ -62,7 +62,7 @@ import java.util.function.Predicate;
  * @param <T> The type of Bloom Filter that is used for the layers.
  * @since 4.5
  */
-public class LayeredBloomFilter<T extends BloomFilter> implements BloomFilter, BloomFilterProducer {
+public class LayeredBloomFilter<T extends BloomFilter> implements BloomFilter, BloomFilterExtractor {
     /**
      * A class used to locate matching filters across all the layers.
      */
@@ -131,7 +131,7 @@ public class LayeredBloomFilter<T extends BloomFilter> implements BloomFilter, B
     }
 
     @Override
-    public boolean contains(final BitMapProducer bitMapProducer) {
+    public boolean contains(final BitMapExtractor bitMapProducer) {
         return contains(createFilter(bitMapProducer));
     }
 
@@ -139,7 +139,7 @@ public class LayeredBloomFilter<T extends BloomFilter> implements BloomFilter, B
      * Returns {@code true} if this any layer contained by this filter contains the
      * specified filter.
      * <p>
-     * If the {@code other} is a BloomFilterProducer each filter within the
+     * If the {@code other} is a BloomFilterExtractor each filter within the
      * {@code other} is checked to see if it exits within this filter.
      * </p>
      *
@@ -148,23 +148,23 @@ public class LayeredBloomFilter<T extends BloomFilter> implements BloomFilter, B
      */
     @Override
     public boolean contains(final BloomFilter other) {
-        return other instanceof BloomFilterProducer ? contains((BloomFilterProducer) other)
-                : !forEachBloomFilter(x -> !x.contains(other));
+        return other instanceof BloomFilterExtractor ? contains((BloomFilterExtractor) other)
+                : !processBloomFilters(x -> !x.contains(other));
     }
 
     /**
      * Returns {@code true} if each filter within the {@code producer} exits within
      * this filter.
      *
-     * @param producer the BloomFilterProducer that provides the filters to check
+     * @param producer the BloomFilterExtractor that provides the filters to check
      *                 for.
      * @return {@code true} if this filter contains all of the filters contained in
      *         the {@code producer}.
      */
-    public boolean contains(final BloomFilterProducer producer) {
+    public boolean contains(final BloomFilterExtractor producer) {
         final boolean[] result = { true };
         // return false when we have found a match to short circuit checks
-        return producer.forEachBloomFilter(x -> {
+        return producer.processBloomFilters(x -> {
             result[0] &= contains(x);
             return result[0];
         });
@@ -176,7 +176,7 @@ public class LayeredBloomFilter<T extends BloomFilter> implements BloomFilter, B
     }
 
     @Override
-    public boolean contains(final IndexProducer indexProducer) {
+    public boolean contains(final IndexExtractor indexProducer) {
         return contains(createFilter(indexProducer));
     }
 
@@ -186,12 +186,12 @@ public class LayeredBloomFilter<T extends BloomFilter> implements BloomFilter, B
     }
 
     /**
-     * Creates a Bloom filter from a BitMapProducer.
+     * Creates a Bloom filter from a BitMapExtractor.
      *
-     * @param bitMapProducer the BitMapProducer to create the filter from.
+     * @param bitMapProducer the BitMapExtractor to create the filter from.
      * @return the BloomFilter.
      */
-    private BloomFilter createFilter(final BitMapProducer bitMapProducer) {
+    private BloomFilter createFilter(final BitMapExtractor bitMapProducer) {
         final SimpleBloomFilter bf = new SimpleBloomFilter(shape);
         bf.merge(bitMapProducer);
         return bf;
@@ -210,12 +210,12 @@ public class LayeredBloomFilter<T extends BloomFilter> implements BloomFilter, B
     }
 
     /**
-     * Creates a Bloom filter from an IndexProducer.
+     * Creates a Bloom filter from an IndexExtractor.
      *
-     * @param indexProducer the IndexProducer to create the filter from.
+     * @param indexProducer the IndexExtractor to create the filter from.
      * @return the BloomFilter.
      */
-    private BloomFilter createFilter(final IndexProducer indexProducer) {
+    private BloomFilter createFilter(final IndexExtractor indexProducer) {
         final SimpleBloomFilter bf = new SimpleBloomFilter(shape);
         bf.merge(indexProducer);
         return bf;
@@ -235,12 +235,12 @@ public class LayeredBloomFilter<T extends BloomFilter> implements BloomFilter, B
     }
 
     /**
-     * Finds the layers in which the BitMapProducer is found.
+     * Finds the layers in which the BitMapExtractor is found.
      *
-     * @param bitMapProducer the BitMapProducer to search for.
+     * @param bitMapProducer the BitMapExtractor to search for.
      * @return an array of layer indices in which the Bloom filter is found.
      */
-    public int[] find(final BitMapProducer bitMapProducer) {
+    public int[] find(final BitMapExtractor bitMapProducer) {
         final SimpleBloomFilter bf = new SimpleBloomFilter(shape);
         bf.merge(bitMapProducer);
         return find(bf);
@@ -254,7 +254,7 @@ public class LayeredBloomFilter<T extends BloomFilter> implements BloomFilter, B
      */
     public int[] find(final BloomFilter bf) {
         final Finder finder = new Finder(bf);
-        forEachBloomFilter(finder);
+        processBloomFilters(finder);
         return finder.getResult();
     }
 
@@ -271,12 +271,12 @@ public class LayeredBloomFilter<T extends BloomFilter> implements BloomFilter, B
     }
 
     /**
-     * Finds the layers in which the IndexProducer is found.
+     * Finds the layers in which the IndexExtractor is found.
      *
-     * @param indexProducer the Index producer to search for.
+     * @param indexProducer the IndexExtractor to search for.
      * @return an array of layer indices in which the Bloom filter is found.
      */
-    public int[] find(final IndexProducer indexProducer) {
+    public int[] find(final IndexExtractor indexProducer) {
         final SimpleBloomFilter bf = new SimpleBloomFilter(shape);
         bf.merge(indexProducer);
         return find(bf);
@@ -291,13 +291,13 @@ public class LayeredBloomFilter<T extends BloomFilter> implements BloomFilter, B
     @Override
     public BloomFilter flatten() {
         final BloomFilter bf = new SimpleBloomFilter(shape);
-        forEachBloomFilter(bf::merge);
+        processBloomFilters(bf::merge);
         return bf;
     }
 
     @Override
-    public boolean forEachBitMap(final LongPredicate predicate) {
-        return flatten().forEachBitMap(predicate);
+    public boolean processBitMaps(final LongPredicate predicate) {
+        return flatten().processBitMaps(predicate);
     }
 
     /**
@@ -310,13 +310,13 @@ public class LayeredBloomFilter<T extends BloomFilter> implements BloomFilter, B
      *         otherwise.
      */
     @Override
-    public final boolean forEachBloomFilter(final Predicate<BloomFilter> bloomFilterPredicate) {
-        return layerManager.forEachBloomFilter(bloomFilterPredicate);
+    public final boolean processBloomFilters(final Predicate<BloomFilter> bloomFilterPredicate) {
+        return layerManager.processBloomFilters(bloomFilterPredicate);
     }
 
     @Override
-    public boolean forEachIndex(final IntPredicate predicate) {
-        return forEachBloomFilter(bf -> bf.forEachIndex(predicate));
+    public boolean processIndices(final IntPredicate predicate) {
+        return processBloomFilters(bf -> bf.processIndices(predicate));
     }
 
     /**
@@ -347,11 +347,11 @@ public class LayeredBloomFilter<T extends BloomFilter> implements BloomFilter, B
 
     @Override
     public boolean isEmpty() {
-        return forEachBloomFilter(BloomFilter::isEmpty);
+        return processBloomFilters(BloomFilter::isEmpty);
     }
 
     @Override
-    public boolean merge(final BitMapProducer bitMapProducer) {
+    public boolean merge(final BitMapExtractor bitMapProducer) {
         return layerManager.getTarget().merge(bitMapProducer);
     }
 
@@ -361,7 +361,7 @@ public class LayeredBloomFilter<T extends BloomFilter> implements BloomFilter, B
     }
 
     @Override
-    public boolean merge(final IndexProducer indexProducer) {
+    public boolean merge(final IndexExtractor indexProducer) {
         return layerManager.getTarget().merge(indexProducer);
     }
 

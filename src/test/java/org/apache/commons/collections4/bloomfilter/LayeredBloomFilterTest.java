@@ -201,14 +201,14 @@ public class LayeredBloomFilterTest extends AbstractBloomFilterTest<LayeredBloom
         return bf;
     }
 
-    protected BloomFilter makeFilter(final IndexProducer p) {
+    protected BloomFilter makeFilter(final IndexExtractor p) {
         final BloomFilter bf = new SparseBloomFilter(getTestShape());
         bf.merge(p);
         return bf;
     }
 
     protected BloomFilter makeFilter(final int... values) {
-        return makeFilter(IndexProducer.fromIndexArray(values));
+        return makeFilter(IndexExtractor.fromIndexArray(values));
     }
 
     private LayeredBloomFilter<BloomFilter> setupFindTest() {
@@ -291,7 +291,7 @@ public class LayeredBloomFilterTest extends AbstractBloomFilterTest<LayeredBloom
         for (int i = 0; i < 10; i++) {
             underTest.merge(TestingHashers.randomHasher());
         }
-        underTest.forEachBloomFilter(dbg.and(x -> lst.add(((TimestampedBloomFilter) x).timestamp)));
+        underTest.processBloomFilters(dbg.and(x -> lst.add(((TimestampedBloomFilter) x).timestamp)));
         assertTrue(underTest.getDepth() > 1);
 
         Thread.sleep(300);
@@ -299,29 +299,29 @@ public class LayeredBloomFilterTest extends AbstractBloomFilterTest<LayeredBloom
             underTest.merge(TestingHashers.randomHasher());
         }
         dbgInstrument.add("=== AFTER 300 milliseconds ====\n");
-        underTest.forEachBloomFilter(dbg);
+        underTest.processBloomFilters(dbg);
 
         Thread.sleep(150);
         for (int i = 0; i < 10; i++) {
             underTest.merge(TestingHashers.randomHasher());
         }
         dbgInstrument.add("=== AFTER 450 milliseconds ====\n");
-        underTest.forEachBloomFilter(dbg);
+        underTest.processBloomFilters(dbg);
 
         // sleep 200 milliseconds to ensure we cross the 600 millisecond boundary
         Thread.sleep(200);
         underTest.merge(TestingHashers.randomHasher());
         dbgInstrument.add("=== AFTER 600 milliseconds ====\n");
-        assertTrue(underTest.forEachBloomFilter(dbg.and(x -> !lst.contains(((TimestampedBloomFilter) x).timestamp))),
+        assertTrue(underTest.processBloomFilters(dbg.and(x -> !lst.contains(((TimestampedBloomFilter) x).timestamp))),
                 "Found filter that should have been deleted: " + dbgInstrument.get(dbgInstrument.size() - 1));
     }
 
     @Test
-    public void testFindBitMapProducer() {
+    public void testFindBitMapExtractor() {
         final LayeredBloomFilter<BloomFilter> filter = setupFindTest();
 
-        IndexProducer idxProducer = TestingHashers.FROM1.indices(getTestShape());
-        BitMapProducer producer = BitMapProducer.fromIndexProducer(idxProducer, getTestShape().getNumberOfBits());
+        IndexExtractor idxProducer = TestingHashers.FROM1.indices(getTestShape());
+        BitMapExtractor producer = BitMapExtractor.fromIndexExtractor(idxProducer, getTestShape().getNumberOfBits());
 
         int[] expected = {0, 3};
         int[] result = filter.find(producer);
@@ -329,7 +329,7 @@ public class LayeredBloomFilterTest extends AbstractBloomFilterTest<LayeredBloom
 
         expected = new int[]{1, 3};
         idxProducer = TestingHashers.FROM11.indices(getTestShape());
-        producer = BitMapProducer.fromIndexProducer(idxProducer, getTestShape().getNumberOfBits());
+        producer = BitMapExtractor.fromIndexExtractor(idxProducer, getTestShape().getNumberOfBits());
         result = filter.find(producer);
         assertArrayEquals(expected, result);
     }
@@ -346,8 +346,8 @@ public class LayeredBloomFilterTest extends AbstractBloomFilterTest<LayeredBloom
     }
 
     @Test
-    public void testFindIndexProducer() {
-        IndexProducer producer = TestingHashers.FROM1.indices(getTestShape());
+    public void testFindIndexExtractor() {
+        IndexExtractor producer = TestingHashers.FROM1.indices(getTestShape());
         final LayeredBloomFilter<BloomFilter> filter = setupFindTest();
 
         int[] expected = {0, 3};
