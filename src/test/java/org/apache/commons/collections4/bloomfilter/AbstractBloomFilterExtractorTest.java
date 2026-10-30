@@ -29,11 +29,11 @@ import org.junit.jupiter.api.Test;
 public abstract class AbstractBloomFilterExtractorTest {
     private final Shape shape = Shape.fromKM(17, 72);
 
-    BloomFilter one = new SimpleBloomFilter(shape);
-    BloomFilter two = new SimpleBloomFilter(shape);
+    BloomFilter<?> one = new SimpleBloomFilter(shape);
+    BloomFilter<?> two = new SimpleBloomFilter(shape);
     int[] nullCount = { 0, 0 };
     int[] equalityCount = { 0 };
-    BiPredicate<BloomFilter, BloomFilter> counter = (x, y) -> {
+    BiPredicate<BloomFilter<?>, BloomFilter<?>> counter = (x, y) -> {
         if (x == null) {
             nullCount[0]++;
         }
@@ -55,7 +55,7 @@ public abstract class AbstractBloomFilterExtractorTest {
      * @param filters The filters to return.
      * @return A BloomFilterExtractor that returns the filters in order.
      */
-    protected abstract BloomFilterExtractor createUnderTest(BloomFilter... filters);
+    protected abstract BloomFilterExtractor createUnderTest(BloomFilter<?>... filters);
 
     /**
      * The shape of the Bloom filters for testing.
@@ -82,7 +82,7 @@ public abstract class AbstractBloomFilterExtractorTest {
 
     @Test
     public void testAsBloomFilterArray() {
-        final BloomFilter[] result = createUnderTest().asBloomFilterArray();
+        final BloomFilter<?>[] result = createUnderTest().asBloomFilterArray();
         assertEquals(2, result.length);
         assertEquals(1, result[0].cardinality());
         assertEquals(2, result[1].cardinality());
@@ -90,8 +90,8 @@ public abstract class AbstractBloomFilterExtractorTest {
 
     @Test
     public void testFlatten() {
-        final BloomFilter underTest = createUnderTest().flatten();
-        final BloomFilter expected = new SimpleBloomFilter(shape);
+        final BloomFilter<?> underTest = createUnderTest().flatten();
+        final BloomFilter<?> expected = new SimpleBloomFilter(shape);
         expected.merge(IndexExtractor.fromIndexArray(1, 2, 3));
         assertArrayEquals(expected.asBitMapArray(), underTest.asBitMapArray());
     }
